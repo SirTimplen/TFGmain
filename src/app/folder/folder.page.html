@@ -1,0 +1,42 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ folder }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">{{ folder }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div id="container">
+    <strong class="capitalize">{{ folder }}</strong>
+
+    <!-- Tabla para "Lineas de TFG" -->
+    <table *ngIf="folder === 'lineas'" border="1" style="width: 100%; text-align: left; margin-top: 20px;">
+      <thead>
+        <tr>
+          <th>Línea ofertada</th>
+          <th>Tutor</th>
+          <th>Descripción</th>
+          <th>Ámbito</th>
+          <th>Plazas libres</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of tableData">
+          <td>{{ row.col1 }}</td>
+          <td>{{ row.col2 }}</td>
+          <td>{{ row.col3 }}</td>
+          <td>{{ row.col4 }}</td>
+          <td>{{ row.col5 }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</ion-content>

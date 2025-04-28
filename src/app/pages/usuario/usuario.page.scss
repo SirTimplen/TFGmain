@@ -1,0 +1,21 @@
+/* filepath: /home/adrian/TFG/src/app/pages/usuario/usuario.page.scss */
+#container {
+    text-align: center;
+    margin: 20px;
+  }
+  
+  ion-list-header {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  ion-item {
+    --padding-start: 16px;
+    --inner-padding-end: 16px;
+    margin-bottom: 10px;
+  }
+  
+  ion-button {
+    --border-radius: 8px;
+  }

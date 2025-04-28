@@ -1,0 +1,7 @@
+{
+  "name": "TFG",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
