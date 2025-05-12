@@ -1,12 +1,80 @@
-/* filepath: /home/adrian/TFG/src/app/pages/login/login.page.scss */
 ion-content {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-  }
-  
-  form {
-    width: 100%;
-    max-width: 400px;
-  }
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; // Asegura que ocupe toda la altura de la pantalla
+  background: linear-gradient(135deg, #007bff, #6c757d); // Fondo degradado elegante
+}
+
+form {
+  width: 100%;
+  max-width: 400px;
+  padding: 30px;
+  background-color: #ffffff; // Fondo blanco para contraste
+  border-radius: 15px; // Bordes redondeados
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); // Sombra para profundidad
+  text-align: center; // Centra el contenido dentro del formulario
+}
+
+form h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333333; // Color oscuro para el título
+  margin-bottom: 10px;
+}
+
+form p {
+  font-size: 14px;
+  color: #666666; // Color gris para el subtítulo
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px; // Espaciado entre los campos
+  text-align: left; // Alinea las etiquetas a la izquierda
+}
+
+label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #495057; // Color gris oscuro para elegancia
+  display: block;
+  margin-bottom: 5px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ced4da; // Borde gris claro
+  border-radius: 5px; // Bordes redondeados
+  box-sizing: border-box;
+}
+
+input:focus {
+  outline: none;
+  border-color: #007bff; // Borde azul al enfocar
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); // Sombra azul al enfocar
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff; // Texto blanco
+  background-color: #007bff; // Fondo azul
+  border: none;
+  border-radius: 5px; // Bordes redondeados
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3; // Azul más oscuro al pasar el cursor
+}
+
+button:disabled {
+  background-color: #cccccc; // Fondo gris para botón deshabilitado
+  cursor: not-allowed;
+}

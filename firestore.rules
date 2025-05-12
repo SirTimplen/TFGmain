@@ -1,0 +1,14 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /Usuario/{document=**} {
+      allow read, write: if true; // Cambiar para producción
+    }
+    match /Tutor/{document=**} {
+      allow read, write: if true; // Cambiar para producción
+    }
+    match /Linea/{document=**} {
+      allow read: if true; // Permitir lectura a todos (solo para pruebas)
+    }
+  }
+}

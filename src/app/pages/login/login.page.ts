@@ -1,6 +1,6 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, IonInput } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { GlobalService } from '../../services/global.service';
@@ -9,28 +9,50 @@ import { GlobalService } from '../../services/global.service';
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
-  standalone: true,
   imports: [IonicModule, FormsModule, CommonModule],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA], // Agregar este esquema
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class LoginPage {
+  @ViewChild('emailInput', { static: false }) emailInput!: IonInput; // Referencia al campo de correo
+
   public email: string = '';
   public password: string = '';
 
   constructor(private router: Router, private globalService: GlobalService) {}
 
-  onLogin() {
-    if (this.email === 'usuario@example.com') {
-      this.globalService.setUserType('usuario');
-      this.router.navigate(['/usuario']);
-    } else if (this.email === 'tutor@example.com') {
-      this.globalService.setUserType('tutor');
-      this.router.navigate(['/tutor']);
-    } else if (this.email === 'tribunal@example.com') {
-      this.globalService.setUserType('tribunal');
-      this.router.navigate(['/tribunal']);
+  ionViewDidEnter() {
+  setTimeout(() => {
+    if (this.emailInput) {
+      this.emailInput.setFocus().catch((err) => console.error('Error al enfocar el campo:', err));
     } else {
-      alert('Credenciales incorrectas');
+      console.error('emailInput no está definido.');
+    }
+  }, 3000000000000); // 3 segundos
+}
+
+  onInputChange(event: any, field: string) {
+    const value = event.target.value;
+    if (field === 'email') {
+      this.email = value;
+    } else if (field === 'password') {
+      this.password = value;
+    }
+  }
+
+  async onLogin(event: Event) {
+    event.preventDefault();
+    try {
+      const userType = await this.globalService.login(this.email, this.password);
+
+      if (userType === 'usuario') {
+        this.router.navigate(['/usuario']);
+      } else if (userType === 'tutor') {
+        this.router.navigate(['/tutor']);
+      } else if (userType === 'tribunal') {
+        this.router.navigate(['/tribunal']);
+      }
+    } catch (error) {
+      alert('Error al iniciar sesión: ');
     }
   }
 }

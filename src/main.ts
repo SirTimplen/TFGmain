@@ -14,6 +14,7 @@ import { getAnalytics } from "firebase/analytics";
 const firebaseConfig = {
   apiKey: "AIzaSyA21bOfc1pWCKyj0Zjwg4vp6RcjBc5Xw_s",
   authDomain: "tfgdetfgs.firebaseapp.com",
+  databaseURL: "https://tfgdetfgs-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "tfgdetfgs",
   storageBucket: "tfgdetfgs.firebasestorage.app",
   messagingSenderId: "570821068180",

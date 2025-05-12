@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
+import { GlobalService } from '../../services/global.service'; // Asegúrate de que la ruta sea correcta
 
 @Component({
   selector: 'app-usuario',
@@ -14,40 +15,21 @@ import { CommonModule } from '@angular/common';
   ],
 })
 export class UsuarioPage implements OnInit {
-  public folder!: string;
+  public lineasTFG: any[] = [];
 
-  private activatedRoute = inject(ActivatedRoute);
+  constructor(private globalService: GlobalService) {}
 
-  constructor() {}
-  public lineasTFG = [
-    {
-      titulo: 'Desarrollo de una aplicación móvil',
-      tutor: 'Dr. Juan Pérez',
-      ambito: 'Ingeniería de Software',
-      descripcion: 'Crear una aplicación móvil para la gestión de tareas.',
-      plazasLibres: 2,
-    },
-    {
-      titulo: 'Análisis de datos con Machine Learning',
-      tutor: 'Dra. Ana López',
-      ambito: 'Inteligencia Artificial',
-      descripcion: 'Aplicar técnicas de Machine Learning para analizar datos.',
-      plazasLibres: 1,
-    },
-    {
-      titulo: 'Diseño de sistemas embebidos',
-      tutor: 'Dr. Carlos García',
-      ambito: 'Sistemas Embebidos',
-      descripcion: 'Diseñar un sistema embebido para IoT.',
-      plazasLibres: 3,
-    },
-  ];
+  async ngOnInit() {
+    try {
+      this.lineasTFG = await this.globalService.obtenerLineas();
+      console.log('Líneas obtenidas:', this.lineasTFG);
+    } catch (error) {
+      console.error('Error al cargar las líneas:', error);
+    }
+  }
 
   solicitarLinea(linea: any) {
-    alert(`Has solicitado la línea: ${linea.titulo}`);
-    // Aquí puedes implementar la lógica para enviar la solicitud al backend
-  }
-  ngOnInit() {
-    this.folder = 'usuario'; // Establece el nombre de la página
+    console.log('Solicitar línea:', linea);
+    // Aquí puedes implementar la lógica para solicitar una línea
   }
 }
