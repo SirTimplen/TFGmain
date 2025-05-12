@@ -13,4 +13,26 @@
       <ion-title size="large">Tutor</ion-title>
     </ion-toolbar>
   </ion-header>
+
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Mis Líneas de TFG</ion-label>
+    </ion-list-header>
+
+    <ion-item *ngFor="let linea of lineasTFG">
+      <ion-label>
+        <h2>{{ linea.titulo }}</h2>
+        <p><strong>Ámbito:</strong> {{ linea.ambito }}</p>
+        <p><strong>Descripción:</strong> {{ linea.descripcion }}</p>
+        <p><strong>Plazas libres:</strong> {{ linea.plazasLibres }}</p>
+      </ion-label>
+      <ion-buttons slot="end">
+        <ion-button color="primary" (click)="editarLinea(linea)">Editar</ion-button>
+      </ion-buttons>
+    </ion-item>
+  </ion-list>
+
+  <ion-button expand="block" color="success" (click)="crearLinea()">
+    Crear Nueva Línea
+  </ion-button>
 </ion-content>

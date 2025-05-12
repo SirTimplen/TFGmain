@@ -9,7 +9,6 @@ export class GlobalService {
   public userType$ = this.userTypeSubject.asObservable();
 
   setUserType(type: 'usuario' | 'tutor' | 'tribunal') {
-    console.log('Setting userType to:', type); // Depuración
     this.userTypeSubject.next(type);
   }
 

@@ -6,7 +6,11 @@ import { addIcons } from 'ionicons';
 import { mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, heartOutline, heartSharp, warningOutline, warningSharp } from 'ionicons/icons';
 import { GlobalService } from './services/global.service';
 import { Router } from '@angular/router';
-
+interface MenuPage {
+  title: string;
+  url: string;
+  icon: string;
+}
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -36,9 +40,10 @@ import { Router } from '@angular/router';
 export class AppComponent implements OnInit{
   public userType: 'usuario' | 'tutor' | 'tribunal' | null = null;
   
-  public menus = {
+  public menus: { [key: string]: MenuPage[] } = {
     usuario:[
-      { title: 'Lineas de TFG', url: '/pages/lineas', icon: 'mail' },
+      { title: 'Lineas de TFG', url: '/pages/usuario', icon: 'mail' },
+      { title: 'Mis Solicitudes', url: '/pages/solicitudes', icon: 'list' },
       { title: 'Asignaciones', url: '/pages/outbox', icon: 'paper-plane' },
       { title: 'Defensa Pública', url: '/pages/favorites', icon: 'heart' },
       { title: 'Información TFG', url: '/pages/spam', icon: 'warning' },
@@ -66,7 +71,7 @@ constructor(public globalService: GlobalService, private router: Router) {}
   }
 
   // Método para obtener las páginas del menú según el tipo de usuario
-get appPages() {
+  get appPages(): MenuPage[] {
     return this.userType ? this.menus[this.userType] : [];
   }
 }
