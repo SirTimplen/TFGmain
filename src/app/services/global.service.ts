@@ -2,11 +2,13 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { getFirestore, doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { addDoc} from 'firebase/firestore';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GlobalService {
+  private userType: 'usuario' | 'tutor' | 'tribunal' | null = null;
   private userTypeSubject = new BehaviorSubject<'usuario' | 'tutor' | 'tribunal' | null>(null);
   userType$ = this.userTypeSubject.asObservable();
 
@@ -69,5 +71,42 @@ async login(email: string, password: string): Promise<'usuario' | 'tutor' | 'tri
       console.error('Error al obtener las líneas:', error);
       throw error;
     }
+  }
+  async crearSolicitud(tutor: string, usuario: string, linea: string): Promise<void> {
+  try {
+    const solicitudesRef = collection(this.db, 'Solicitud');
+    const usuarioQuery = query(solicitudesRef, where('usuario', '==', usuario));
+    const snapshot = await getDocs(usuarioQuery);
+
+    const principal = snapshot.empty; // Si no hay solicitudes, será principal (true)
+
+    await addDoc(solicitudesRef, {
+      tutor,
+      usuario,
+      linea,
+      principal,
+      fecha: new Date().toISOString(),
+      estado: 'Pendiente',
+    });
+  } catch (error) {
+    console.error('Error al crear la solicitud:', error);
+    throw error;
+  }
+  
+}
+async obtenerSolicitudes(usuario: string): Promise<any[]> {
+  try {
+    const solicitudesRef = collection(this.db, 'Solicitud');
+    const usuarioQuery = query(solicitudesRef, where('usuario', '==', usuario));
+    const snapshot = await getDocs(usuarioQuery);
+
+    return snapshot.docs.map((doc) => doc.data());
+  } catch (error) {
+    console.error('Error al obtener las solicitudes:', error);
+    throw error;
+  }
+}
+getUserType(): 'usuario' | 'tutor' | 'tribunal' | null {
+    return this.userTypeSubject.getValue();
   }
 }

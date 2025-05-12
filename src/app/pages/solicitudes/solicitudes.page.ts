@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { RouterModule } from '@angular/router';
 import { AppComponent } from '../../app.component'; // Importa AppComponent
+import { GlobalService } from '../../services/global.service'; // Asegúrate de que la ruta sea correcta
 
 interface MenuPage {
   title: string;
@@ -18,18 +19,26 @@ interface MenuPage {
   imports: [IonicModule, CommonModule, RouterModule],
 })
 export class SolicitudesPage implements OnInit {
-  public solicitudes = [
-    { titulo: 'Desarrollo de una aplicación móvil', estado: 'Aceptada' },
-    { titulo: 'Análisis de datos con Machine Learning', estado: 'Pendiente' },
-    { titulo: 'Diseño de sistemas embebidos', estado: 'Rechazada' },
-  ];
+  public solicitudes: any[] = []; // Cambia el tipo según tu necesidad
 
   public appPages: MenuPage[] = []; // Define el tipo explícito
 
-  constructor(private appComponent: AppComponent) {} // Inyecta AppComponent
+  constructor(private appComponent: AppComponent,private globalService: GlobalService) {} // Inyecta AppComponent
 
   ngOnInit() {
-    // Obtén las páginas del menú desde AppComponent
-    this.appPages = this.appComponent.appPages;
+  const usuario = this.appComponent.userType; // Obtén el correo del usuario autenticado
+  if (!usuario) {
+    console.error('Usuario no autenticado');
+    return;
   }
+
+  this.globalService
+    .obtenerSolicitudes(usuario)
+    .then((solicitudes) => {
+      this.solicitudes = solicitudes;
+    })
+    .catch((error) => {
+      console.error('Error al cargar las solicitudes:', error);
+    });
+}
 }

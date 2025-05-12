@@ -29,7 +29,21 @@ export class UsuarioPage implements OnInit {
   }
 
   solicitarLinea(linea: any) {
-    console.log('Solicitar línea:', linea);
-    // Aquí puedes implementar la lógica para solicitar una línea
+  const usuario = this.globalService.getUserType(); // Obtén el tipo de usuario actual
+  if (!usuario) {
+    console.error('Usuario no autenticado');
+    return;
   }
+
+  this.globalService
+    .crearSolicitud(linea.Tutor, usuario, linea.Titulo)
+    .then(() => {
+      console.log('Solicitud creada con éxito');
+      alert('Solicitud enviada con éxito');
+    })
+    .catch((error) => {
+      console.error('Error al crear la solicitud:', error);
+      alert('Error al enviar la solicitud');
+    });
+}
 }

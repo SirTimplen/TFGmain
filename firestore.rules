@@ -10,5 +10,8 @@ service cloud.firestore {
     match /Linea/{document=**} {
       allow read: if true; // Permitir lectura a todos (solo para pruebas)
     }
+    match /Solicitud/{document=**} {
+      allow read,write: if true; // Permitir lectura a todos (solo para pruebas)
+    }
   }
 }

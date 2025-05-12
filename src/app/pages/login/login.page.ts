@@ -27,7 +27,7 @@ export class LoginPage {
     } else {
       console.error('emailInput no está definido.');
     }
-  }, 3000000000000); // 3 segundos
+  }, 3000); // 3 segundos
 }
 
   onInputChange(event: any, field: string) {
