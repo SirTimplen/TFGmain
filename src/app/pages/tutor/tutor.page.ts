@@ -1,47 +1,55 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent,IonList,IonListHeader,IonLabel,IonItem, IonMenuButton, IonButton, IonButtons, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonicModule } from '@ionic/angular';
 import { LineaFormComponent } from '../../components/linea-form/linea-form.component';
 import { ModalController } from '@ionic/angular';
+import { GlobalService } from '../../services/global.service'; // Asegúrate de que la ruta sea correcta
+
 @Component({
   selector: 'app-tutor',
   templateUrl: './tutor.page.html',
   styleUrls: ['./tutor.page.scss'],
   standalone: true,
-  imports: [IonContent,IonItem,IonList,LineaFormComponent,IonListHeader, IonMenuButton,IonLabel, IonButton, IonButtons, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule],
+  imports: [
+    IonicModule, // Importa todos los componentes de Ionic desde aquí
+    CommonModule,
+    FormsModule,
+    LineaFormComponent,
+  ],
 })
 export class TutorPage implements OnInit {
-  public lineasTFG = [
-    {
-      titulo: 'Desarrollo de una aplicación móvil',
-      ambito: 'Ingeniería de Software',
-      descripcion: 'Crear una aplicación móvil para la gestión de tareas.',
-      plazasLibres: 2,
-    },
-    {
-      titulo: 'Análisis de datos con Machine Learning',
-      ambito: 'Inteligencia Artificial',
-      descripcion: 'Aplicar técnicas de Machine Learning para analizar datos.',
-      plazasLibres: 1,
-    },
-  ];
+  public lineasTFG: any[] = [];
 
-  constructor(private modalController: ModalController) {}
+  constructor(private modalController: ModalController, private globalService: GlobalService) {}
 
-  ngOnInit() {}
+  async ngOnInit() {
+  try {
+    const tutorEmail = await this.globalService.getUserEmail(); // Obtén el correo del tutor autenticado
+    if (!tutorEmail) {
+      console.error('No se pudo obtener el correo del tutor');
+      return;
+    }
 
-  async editarLinea(linea: any) {
+    this.lineasTFG = await this.globalService.obtenerLineasPorTutor(tutorEmail); // Filtra las líneas por el correo del tutor
+  } catch (error) {
+    console.error('Error al cargar las líneas:', error);
+  }
+}
+
+  async crearLinea() {
     const modal = await this.modalController.create({
       component: LineaFormComponent,
-      componentProps: { linea: { ...linea }, isEdit: true },
     });
 
-    modal.onDidDismiss().then((result) => {
+    modal.onDidDismiss().then(async (result) => {
       if (result.data) {
-        const index = this.lineasTFG.findIndex((l) => l === linea);
-        if (index > -1) {
-          this.lineasTFG[index] = result.data;
+        const tutorEmail = await this.globalService.getUserEmail(); // Espera a que el Promise se resuelva
+        if (tutorEmail) {
+          await this.globalService.crearLinea(result.data, tutorEmail);
+          this.lineasTFG.push(result.data);
+        } else {
+          console.error('No se pudo obtener el correo del tutor');
         }
       }
     });
@@ -49,18 +57,22 @@ export class TutorPage implements OnInit {
     await modal.present();
   }
 
-  async crearLinea() {
+  async editarLinea(linea: any) {
     const modal = await this.modalController.create({
       component: LineaFormComponent,
+      componentProps: { linea: { ...linea }, isEdit: true },
     });
 
-    modal.onDidDismiss().then((result) => {
+    modal.onDidDismiss().then(async (result) => {
       if (result.data) {
-        this.lineasTFG.push(result.data);
+        const index = this.lineasTFG.findIndex((l) => l === linea);
+        if (index > -1) {
+          this.lineasTFG[index] = result.data;
+          await this.globalService.actualizarLinea(linea.id, result.data);
+        }
       }
     });
 
     await modal.present();
   }
-
 }

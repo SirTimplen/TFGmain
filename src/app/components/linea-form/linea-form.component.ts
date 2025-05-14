@@ -1,14 +1,15 @@
 import { Component, Input } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import {IonicModule} from '@ionic/angular';
+
 @Component({
   selector: 'app-linea-form',
   templateUrl: './linea-form.component.html',
   styleUrls: ['./linea-form.component.scss'],
   standalone: true,
-  imports: [CommonModule,IonicModule, FormsModule],
+  imports: [CommonModule, FormsModule, IonicModule],
 })
 export class LineaFormComponent {
   @Input() linea: any = { titulo: '', ambito: '', descripcion: '', plazasLibres: 0 };

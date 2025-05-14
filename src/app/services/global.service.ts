@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { getFirestore, doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
 import { addDoc} from 'firebase/firestore';
 
 @Injectable({
@@ -62,16 +62,27 @@ async login(email: string, password: string): Promise<'usuario' | 'tutor' | 'tri
   }
   private db = getFirestore();
   async obtenerLineas(): Promise<any[]> {
-    try {
-      const lineasRef = collection(this.db, 'Linea');
-      const snapshot = await getDocs(lineasRef);
-      const lineas = snapshot.docs.map((doc) => doc.data());
-      return lineas;
-    } catch (error) {
-      console.error('Error al obtener las líneas:', error);
-      throw error;
-    }
+  try {
+    const lineasRef = collection(this.db, 'Linea');
+    const snapshot = await getDocs(lineasRef);
+
+    // Mapea los datos y asegúrate de que todos los campos estén presentes
+    return snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id, // Incluye el ID del documento
+        titulo: data['titulo'] || 'Sin título',
+        ambito: data['ambito'] || 'Sin ámbito',
+        descripcion: data['descripcion'] || 'Sin descripción',
+        plazasLibres: data['plazasLibres'] || 0,
+        tutor: data['tutor'] || 'Sin tutor',
+      };
+    });
+  } catch (error) {
+    console.error('Error al obtener las líneas:', error);
+    throw error;
   }
+}
   async crearSolicitud(tutor: string, usuario: string, linea: string): Promise<void> {
   try {
     const solicitudesRef = collection(this.db, 'Solicitud');
@@ -109,4 +120,50 @@ async obtenerSolicitudes(usuario: string): Promise<any[]> {
 getUserType(): 'usuario' | 'tutor' | 'tribunal' | null {
     return this.userTypeSubject.getValue();
   }
+async crearLinea(linea: any, tutorEmail: string): Promise<void> {
+  try {
+    const lineasRef = collection(this.db, 'Linea');
+    await addDoc(lineasRef, {
+      ...linea,
+      tutor: tutorEmail, // Asigna el correo del tutor autenticado
+    });
+    console.log('Línea creada con éxito');
+  } catch (error) {
+    console.error('Error al crear la línea:', error);
+    throw error;
+  }
+}
+async obtenerLineasPorTutor(tutorEmail: string): Promise<any[]> {
+  try {
+    const lineasRef = collection(this.db, 'Linea');
+    const tutorQuery = query(lineasRef, where('tutor', '==', tutorEmail)); // Filtra por el correo del tutor
+    const snapshot = await getDocs(tutorQuery);
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })); // Incluye el ID del documento
+  } catch (error) {
+    console.error('Error al obtener las líneas del tutor:', error);
+    throw error;
+  }
+}
+async actualizarLinea(lineaId: string, linea: any): Promise<void> {
+  try {
+    const lineaRef = doc(this.db, 'Linea', lineaId);
+    await updateDoc(lineaRef, linea);
+    console.log('Línea actualizada con éxito');
+  } catch (error) {
+    console.error('Error al actualizar la línea:', error);
+    throw error;
+  }
+}
+
+async getUserEmail(): Promise<string | null> {
+  const auth = getAuth();
+  const user = auth.currentUser;
+
+  if (user) {
+    return user.email;
+  } else {
+    console.error('No hay usuario autenticado');
+    return null;
+  }
+}
 }

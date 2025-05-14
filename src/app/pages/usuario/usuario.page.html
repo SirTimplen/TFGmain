@@ -20,16 +20,16 @@
     </ion-list-header>
 
     <ion-item *ngFor="let linea of lineasTFG">
-      <ion-label>
-        <h2>{{ linea.Titulo }}</h2>
-        <p><strong>Tutor:</strong> {{ linea.Tutor }}</p>
-        <p><strong>Ámbito:</strong> {{ linea.Ambito }}</p>
-        <p><strong>Descripción:</strong> {{ linea.Descripcion }}</p>
-        <p><strong>Plazas libres:</strong> {{ linea['Plazas libres'] }}</p>
-      </ion-label>
-      <ion-button slot="end" color="primary" (click)="solicitarLinea(linea)">
-        Solicitar
-      </ion-button>
-    </ion-item>
+  <ion-label>
+    <h2>{{ linea.titulo || 'Sin título' }}</h2>
+    <p><strong>Tutor:</strong> {{ linea.tutor || 'Sin tutor' }}</p>
+    <p><strong>Ámbito:</strong> {{ linea.ambito || 'Sin ámbito' }}</p>
+    <p><strong>Descripción:</strong> {{ linea.descripcion || 'Sin descripción' }}</p>
+    <p><strong>Plazas libres:</strong> {{ linea.plazasLibres || 0 }}</p>
+  </ion-label>
+  <ion-button slot="end" color="primary" (click)="solicitarLinea(linea)">
+    Solicitar
+  </ion-button>
+</ion-item>
   </ion-list>
 </ion-content>

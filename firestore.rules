@@ -8,10 +8,13 @@ service cloud.firestore {
       allow read, write: if true; // Cambiar para producción
     }
     match /Linea/{document=**} {
-      allow read: if true; // Permitir lectura a todos (solo para pruebas)
+      allow read,write: if true; // Permitir lectura a todos (solo para pruebas)
     }
     match /Solicitud/{document=**} {
       allow read,write: if true; // Permitir lectura a todos (solo para pruebas)
+    }
+    match /Tribunal/{document=**} {
+      allow read: if true; // Cambiar para producción
     }
   }
 }
