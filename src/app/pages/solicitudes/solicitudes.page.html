@@ -33,9 +33,8 @@
 
     <ion-item *ngFor="let solicitud of solicitudes">
       <ion-label>
-        <h2>{{ solicitud.titulo }}</h2>
+        <h2>{{ solicitud.linea }}</h2>
         <p><strong>Tutor:</strong> {{ solicitud.tutor }}</p>
-        <p><strong>Estado:</strong> {{ solicitud.estado }}</p>
         <p><strong>Fecha:</strong> {{ solicitud.fecha | date }}</p>
         <p><strong>Principal:</strong> {{ solicitud.principal ? 'Sí' : 'No' }}</p>
         <p><strong>Estado:</strong> {{ solicitud.estado }}</p>
