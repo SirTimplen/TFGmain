@@ -4,6 +4,7 @@ import { UsuarioPage } from './pages/usuario/usuario.page';
 import { TutorPage } from './pages/tutor/tutor.page';
 import { TribunalPage } from './pages/tribunal/tribunal.page';
 import { SolicitudesPage } from './pages/solicitudes/solicitudes.page';
+import { SolicitudesTutorPage } from './pages/solicitudesTutor/solicitudesTutor.page';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -15,4 +16,9 @@ export const routes: Routes = [
   { path: 'tutor', component: TutorPage },
   { path: 'tribunal', component: TribunalPage },
   { path: 'pages/solicitudes', component: SolicitudesPage },
+  { path: 'pages/solicitudesTutor', component: SolicitudesTutorPage },
+  {
+    path: 'admin',
+    loadComponent: () => import('./pages/admin/admin.page').then( m => m.AdminPage)
+  },
 ];

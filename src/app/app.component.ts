@@ -47,7 +47,7 @@ export class AppComponent implements OnInit{
   ],
   tutor: [
     { title: 'Mis Líneas de TFG', url: '/tutor', icon: 'mail' }, // Asegúrate de que la URL sea correcta
-    { title: 'Asignaciones', url: '/pages/outbox', icon: 'paper-plane' },
+    { title: 'Solicitudes', url: '/pages/solicitudesTutor', icon: 'paper-plane' },
   ],
   tribunal: [
     { title: 'Lineas de TFG', url: '/pages/lineas', icon: 'mail' },

@@ -37,25 +37,26 @@ export class TutorPage implements OnInit {
     console.error('Error al cargar las líneas:', error);
   }
 }
-  async crearLinea() {
-    const modal = await this.modalController.create({
-      component: LineaFormComponent,
-    });
+async crearLinea() {
+  const modal = await this.modalController.create({
+    component: LineaFormComponent,
+  });
 
-    modal.onDidDismiss().then(async (result) => {
-      if (result.data) {
-        const tutorEmail = await this.globalService.getUserEmail(); // Espera a que el Promise se resuelva
-        if (tutorEmail) {
-          await this.globalService.crearLinea(result.data, tutorEmail);
-          this.lineasTFG.push(result.data);
-        } else {
-          console.error('No se pudo obtener el correo del tutor');
-        }
+  modal.onDidDismiss().then(async (result) => {
+    if (result.data) {
+      const tutorEmail = await this.globalService.getUserEmail();
+      if (tutorEmail) {
+        result.data.plazasOriginal = result.data.plazasLibres; // Asigna el valor de plazasOriginal
+        await this.globalService.crearLinea(result.data, tutorEmail);
+        this.lineasTFG.push(result.data);
+      } else {
+        console.error('No se pudo obtener el correo del tutor');
       }
-    });
+    }
+  });
 
-    await modal.present();
-  }
+  await modal.present();
+}
 
   async editarLinea(linea: any) {
     const modal = await this.modalController.create({

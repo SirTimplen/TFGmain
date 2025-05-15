@@ -40,19 +40,26 @@ export class LoginPage {
   }
 
   async onLogin(event: Event) {
-    event.preventDefault();
-    try {
-      const userType = await this.globalService.login(this.email, this.password);
+  event.preventDefault();
 
-      if (userType === 'usuario') {
-        this.router.navigate(['/usuario']);
-      } else if (userType === 'tutor') {
-        this.router.navigate(['/tutor']);
-      } else if (userType === 'tribunal') {
-        this.router.navigate(['/tribunal']);
-      }
-    } catch (error) {
-      alert('Error al iniciar sesión: ');
-    }
+  // Verifica si las credenciales son del administrador
+  if (this.email === 'administrador@gmail.com' && this.password === 'administrador') {
+    this.router.navigate(['/admin']); // Redirige a la página de administración
+    return;
   }
+
+  try {
+    const userType = await this.globalService.login(this.email, this.password);
+
+    if (userType === 'usuario') {
+      this.router.navigate(['/usuario']);
+    } else if (userType === 'tutor') {
+      this.router.navigate(['/tutor']);
+    } else if (userType === 'tribunal') {
+      this.router.navigate(['/tribunal']);
+    }
+  } catch (error) {
+    alert('Error al iniciar sesión: ');
+  }
+}
 }

@@ -88,39 +88,6 @@ async login(email: string, password: string): Promise<'usuario' | 'tutor' | 'tri
     throw error;
   }
 }
-async crearSolicitud(tutorId: string, lineaId: string): Promise<void> {
-  try {
-    const userEmail = await this.getUserEmail(); // Obtén el correo del usuario autenticado
-    if (!userEmail) {
-      throw new Error('Usuario no autenticado');
-    }
-
-    const solicitudesRef = collection(this.db, 'Solicitud');
-    const usuarioQuery = query(
-      solicitudesRef,
-      where('usuario', '==', userEmail), // Filtra por el correo del usuario
-      where('estado', 'in', ['Pendiente', 'Aceptada']) // Verifica solicitudes pendientes o aceptadas
-    );
-    const snapshot = await getDocs(usuarioQuery);
-
-    if (!snapshot.empty) {
-      throw new Error('Ya tienes una solicitud pendiente o aceptada.');
-    }
-
-    await addDoc(solicitudesRef, {
-      tutor: tutorId, // Almacena la ID del tutor
-      usuario: userEmail, // Almacena el correo del usuario
-      linea: lineaId, // Almacena la ID de la línea
-      fecha: new Date().toISOString(),
-      estado: 'Pendiente',
-    });
-
-    console.log('Solicitud creada con éxito');
-  } catch (error) {
-    console.error('Error al crear la solicitud:', error);
-    throw error;
-  }
-}
 async obtenerSolicitudes(): Promise<any[]> {
   try {
     const userEmail = await this.getUserEmail(); // Obtén el correo del usuario autenticado
@@ -180,6 +147,7 @@ async crearLinea(linea: any, tutorEmail: string): Promise<void> {
     await addDoc(lineasRef, {
       ...linea,
       tutor: tutorEmail, // Asigna el correo del tutor autenticado
+      plazasOriginal: linea.plazasLibres, // Almacena el número original de plazas
     });
     console.log('Línea creada con éxito');
   } catch (error) {
@@ -218,6 +186,128 @@ async getUserEmail(): Promise<string | null> {
   } else {
     console.error('No hay usuario autenticado');
     return null;
+  }
+}
+async obtenerSolicitudesPorTutor(tutorEmail: string): Promise<any[]> {
+  try {
+    const solicitudesRef = collection(this.db, 'Solicitud');
+    const tutorQuery = query(solicitudesRef, where('tutor', '==', tutorEmail));
+    const snapshot = await getDocs(tutorQuery);
+
+    const solicitudes = await Promise.all(
+      snapshot.docs.map(async (docSnapshot) => {
+        const data = docSnapshot.data();
+
+        // Obtén el nombre y correo del alumno
+        const usuarioQuery = query(collection(this.db, 'Usuario'), where('Correo', '==', data['usuario']));
+        const usuarioSnapshot = await getDocs(usuarioQuery);
+        const alumno = usuarioSnapshot.docs[0]?.data() || {};
+
+        // Obtén el título de la línea
+        const lineaDoc = await getDoc(doc(this.db, 'Linea', data['linea']));
+        const lineaTitulo = lineaDoc.exists() ? lineaDoc.data()?.['titulo'] || 'Sin título' : 'Sin título';
+
+        return {
+          id: docSnapshot.id,
+          linea: lineaTitulo,
+          alumnoNombre: alumno['Nombre'] || 'Sin nombre',
+          alumnoCorreo: alumno['Correo'] || 'Sin correo',
+          estado: data['estado'],
+        };
+      })
+    );
+
+    return solicitudes;
+  } catch (error) {
+    console.error('Error al obtener las solicitudes por tutor:', error);
+    throw error;
+  }
+}
+
+async actualizarEstadoSolicitud(solicitudId: string, estado: string): Promise<void> {
+  try {
+    const solicitudRef = doc(this.db, 'Solicitud', solicitudId);
+    const solicitudSnapshot = await getDoc(solicitudRef);
+    if (!solicitudSnapshot.exists()) {
+      throw new Error('Solicitud no encontrada');
+    }
+
+    const solicitudData = solicitudSnapshot.data();
+    const lineaRef = doc(this.db, 'Linea', solicitudData['linea']);
+    const lineaSnapshot = await getDoc(lineaRef);
+
+    if (!lineaSnapshot.exists()) {
+      throw new Error('Línea no encontrada');
+    }
+
+    const lineaData = lineaSnapshot.data();
+    let plazasLibres = lineaData['plazasLibres'];
+
+    if (estado === 'Aceptada' && solicitudData['estado'] !== 'Aceptada') {
+      if (plazasLibres > 0) {
+        plazasLibres -= 1;
+      } else {
+        throw new Error('No hay plazas disponibles');
+      }
+    } else if (estado === 'Rechazada' && solicitudData['estado'] === 'Aceptada') {
+      plazasLibres += 1;
+    }
+
+    // Actualiza el estado de la solicitud
+    await updateDoc(solicitudRef, { estado });
+
+    // Actualiza las plazas libres de la línea
+    await updateDoc(lineaRef, { plazasLibres });
+
+    console.log(`Estado de la solicitud actualizado a: ${estado}`);
+  } catch (error) {
+    console.error('Error al actualizar el estado de la solicitud:', error);
+    throw error;
+  }
+}
+async crearSolicitud(tutorId: string, lineaId: string): Promise<void> {
+  try {
+    const userEmail = await this.getUserEmail(); // Obtén el correo del usuario autenticado
+    if (!userEmail) {
+      throw new Error('Usuario no autenticado');
+    }
+
+    const lineaRef = doc(this.db, 'Linea', lineaId);
+    const lineaSnapshot = await getDoc(lineaRef);
+
+    if (!lineaSnapshot.exists()) {
+      throw new Error('Línea no encontrada');
+    }
+
+    const lineaData = lineaSnapshot.data();
+    if (lineaData['plazasLibres'] <= 0) {
+      throw new Error('No hay plazas disponibles para esta línea');
+    }
+
+    const solicitudesRef = collection(this.db, 'Solicitud');
+    const usuarioQuery = query(
+      solicitudesRef,
+      where('usuario', '==', userEmail),
+      where('estado', 'in', ['Pendiente', 'Aceptada'])
+    );
+    const snapshot = await getDocs(usuarioQuery);
+
+    if (!snapshot.empty) {
+      throw new Error('Ya tienes una solicitud pendiente o aceptada.');
+    }
+
+    await addDoc(solicitudesRef, {
+      tutor: tutorId,
+      usuario: userEmail,
+      linea: lineaId,
+      fecha: new Date().toISOString(),
+      estado: 'Pendiente',
+    });
+
+    console.log('Solicitud creada con éxito');
+  } catch (error) {
+    console.error('Error al crear la solicitud:', error);
+    throw error;
   }
 }
 }

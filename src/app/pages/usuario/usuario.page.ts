@@ -29,8 +29,13 @@ export class UsuarioPage implements OnInit {
   }
 
   solicitarLinea(linea: any) {
+  if (linea.plazasLibres <= 0) {
+    alert('No hay plazas disponibles para esta línea');
+    return;
+  }
+
   this.globalService
-    .crearSolicitud(linea.tutor, linea.id) // Pasa las IDs de línea y tutor
+    .crearSolicitud(linea.tutor, linea.id)
     .then(() => {
       console.log('Solicitud creada con éxito');
       alert('Solicitud enviada con éxito');
