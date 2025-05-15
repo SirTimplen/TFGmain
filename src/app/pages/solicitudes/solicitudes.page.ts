@@ -33,7 +33,7 @@ export class SolicitudesPage implements OnInit {
   }
 
   this.globalService
-    .obtenerSolicitudes(usuario)
+    .obtenerSolicitudes()
     .then((solicitudes) => {
       this.solicitudes = solicitudes;
     })

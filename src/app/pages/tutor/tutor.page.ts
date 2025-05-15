@@ -32,11 +32,11 @@ export class TutorPage implements OnInit {
     }
 
     this.lineasTFG = await this.globalService.obtenerLineasPorTutor(tutorEmail); // Filtra las líneas por el correo del tutor
+    console.log('Líneas obtenidas:', this.lineasTFG);
   } catch (error) {
     console.error('Error al cargar las líneas:', error);
   }
 }
-
   async crearLinea() {
     const modal = await this.modalController.create({
       component: LineaFormComponent,
