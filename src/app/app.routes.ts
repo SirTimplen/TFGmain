@@ -21,4 +21,12 @@ export const routes: Routes = [
     path: 'admin',
     loadComponent: () => import('./pages/admin/admin.page').then( m => m.AdminPage)
   },
+  {
+    path: 'admin-asignaciones',
+    loadComponent: () => import('./pages/admin-asignaciones/admin-asignaciones.page').then( m => m.AdminAsignacionesPage)
+  },
+  {
+    path: 'asignaciones',
+    loadComponent: () => import('./pages/asignaciones/asignaciones.page').then( m => m.AsignacionesPage)
+  },
 ];

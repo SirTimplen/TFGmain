@@ -3,25 +3,21 @@ import { BehaviorSubject } from 'rxjs';
 import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { getFirestore, doc, getDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
 import { addDoc} from 'firebase/firestore';
-import { LineaFormComponent } from '../components/linea-form/linea-form.component';
-import { ModalController } from '@ionic/angular';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { deleteDoc } from 'firebase/firestore';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GlobalService {
-  private userType: 'usuario' | 'tutor' | 'tribunal' | null = null;
-  private userTypeSubject = new BehaviorSubject<'usuario' | 'tutor' | 'tribunal' | null>(null);
+  private userType: 'usuario' | 'tutor' | 'tribunal' |'admin' | null = null;
+  private userTypeSubject = new BehaviorSubject<'usuario' | 'tutor' | 'tribunal' |'admin' | null>(null);
   userType$ = this.userTypeSubject.asObservable();
 
-  setUserType(type: 'usuario' | 'tutor' | 'tribunal') { 
+  setUserType(type: 'usuario' | 'tutor' | 'tribunal'|'admin' ) { 
     this.userTypeSubject.next(type);
   }
 
-async login(email: string, password: string): Promise<'usuario' | 'tutor' | 'tribunal'> {
+async login(email: string, password: string): Promise<'usuario' | 'tutor' | 'tribunal'|'admin' > {
   const auth = getAuth();
   const db = getFirestore();
 
@@ -80,6 +76,7 @@ async login(email: string, password: string): Promise<'usuario' | 'tutor' | 'tri
         ambito: data['ambito'] || 'Sin ámbito',
         descripcion: data['descripcion'] || 'Sin descripción',
         plazasLibres: data['plazasLibres'] || 0,
+        plazasOriginal: data['plazasOriginal'] || 0,
         tutor: data['tutor'] || 'Sin tutor',
       };
     });
@@ -138,16 +135,21 @@ async obtenerSolicitudes(): Promise<any[]> {
     throw error;
   }
 }
-getUserType(): 'usuario' | 'tutor' | 'tribunal' | null {
+getUserType(): 'usuario' | 'tutor' | 'tribunal' |'admin' | null {
     return this.userTypeSubject.getValue();
   }
 async crearLinea(linea: any, tutorEmail: string): Promise<void> {
   try {
     const lineasRef = collection(this.db, 'Linea');
+    // Asegura que los campos sean number
+    const plazasLibres = Number(linea.plazasLibres);
+    const plazasOriginal = Number(linea.plazasOriginal ?? linea.plazasLibres);
+
     await addDoc(lineasRef, {
       ...linea,
-      tutor: tutorEmail, // Asigna el correo del tutor autenticado
-      plazasOriginal: linea.plazasLibres, // Almacena el número original de plazas
+      tutor: tutorEmail,
+      plazasLibres,
+      plazasOriginal,
     });
     console.log('Línea creada con éxito');
   } catch (error) {
@@ -169,6 +171,13 @@ async obtenerLineasPorTutor(tutorId: string): Promise<any[]> {
 async actualizarLinea(lineaId: string, linea: any): Promise<void> {
   try {
     const lineaRef = doc(this.db, 'Linea', lineaId);
+    // Fuerza los campos a number antes de actualizar
+    if (linea.plazasLibres !== undefined) {
+      linea.plazasLibres = Number(linea.plazasLibres);
+    }
+    if (linea.plazasOriginal !== undefined) {
+      linea.plazasOriginal = Number(linea.plazasOriginal);
+    }
     await updateDoc(lineaRef, linea);
     console.log('Línea actualizada con éxito');
   } catch (error) {
@@ -302,11 +311,24 @@ async crearSolicitud(tutorId: string, lineaId: string): Promise<void> {
       linea: lineaId,
       fecha: new Date().toISOString(),
       estado: 'Pendiente',
+      asignacion: false,
     });
 
     console.log('Solicitud creada con éxito');
   } catch (error) {
     console.error('Error al crear la solicitud:', error);
+    throw error;
+  }
+}
+// ...existing code...
+
+async borrarLinea(lineaId: string): Promise<void> {
+  try {
+    const lineaRef = doc(this.db, 'Linea', lineaId);
+    await deleteDoc(lineaRef);
+    console.log('Línea borrada con éxito');
+  } catch (error) {
+    console.error('Error al borrar la línea:', error);
     throw error;
   }
 }

@@ -1,13 +1,63 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>admin</ion-title>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button> <!-- Botón para abrir el menú -->
+    </ion-buttons>
+    <ion-title>Administrador de lineas</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">admin</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <!-- Botón para mostrar el formulario de nueva línea -->
+  <button class="custom-btn" (click)="mostrarFormulario = !mostrarFormulario">
+    {{ mostrarFormulario ? 'Ocultar formulario' : 'Crear Nueva Línea' }}
+  </button>
+
+  <!-- Formulario de nueva línea, visible solo si mostrarFormulario es true -->
+  <ion-list *ngIf="mostrarFormulario">
+    <ion-list-header>
+      <ion-label>Crear Nueva Línea</ion-label>
+    </ion-list-header>
+    <ion-item>
+      <ion-input placeholder="Título" [(ngModel)]="nuevaLinea.titulo"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-input placeholder="Ámbito" [(ngModel)]="nuevaLinea.ambito"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-textarea placeholder="Descripción" [(ngModel)]="nuevaLinea.descripcion"></ion-textarea>
+    </ion-item>
+    <ion-item>
+      <ion-input type="number" placeholder="Plazas Libres" [(ngModel)]="nuevaLinea.plazasLibres"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-input type="number" placeholder="Plazas Original" [(ngModel)]="nuevaLinea.plazasOriginal"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-input placeholder="Tutor" [(ngModel)]="nuevaLinea.tutor"></ion-input>
+    </ion-item>
+    <button class="custom-btn" (click)="crearLinea()">Crear Línea</button>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Todas las Líneas</ion-label>
+      <button class="custom-btn warning" (click)="resetPlazasTodas()">Resetear plazas de todas</button>
+    </ion-list-header>
+    <ion-item *ngFor="let linea of lineas">
+      <ion-label>
+        <h2>{{ linea.titulo }}</h2>
+        <p><strong>Ámbito:</strong> {{ linea.ambito }}</p>
+        <p><strong>Descripción:</strong> {{ linea.descripcion }}</p>
+        <p><strong>Plazas libres:</strong> {{ linea.plazasLibres }}</p>
+        <p><strong>Plazas original:</strong> {{ linea.plazasOriginal }}</p>
+        <p><strong>Tutor:</strong> {{ linea.tutor }}</p>
+      </ion-label>
+      <div style="display: flex; flex-direction: column; gap: 4px; margin-left: 10px;">
+        <button class="custom-btn primary" (click)="editarLinea(linea)">Editar</button>
+        <button class="custom-btn danger" (click)="borrarLinea(linea)">Borrar</button>
+        <button class="custom-btn" (click)="resetPlazas(linea)">Resetear plazas</button>
+      </div>
+    </ion-item>
+  </ion-list>
 </ion-content>

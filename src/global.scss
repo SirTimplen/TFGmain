@@ -35,3 +35,45 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+/* Puedes poner esto en src/global.scss o importarlo en cada página */
+.custom-btn {
+  display: inline-block;
+  padding: 8px 16px;
+  margin: 2px 0;
+  font-size: 15px;
+  font-weight: 500;
+  border: none;
+  border-radius: 5px;
+  background: #3880ff;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.custom-btn.primary {
+  background: #3880ff;
+}
+
+.custom-btn.success {
+  background: #10dc60;
+}
+
+.custom-btn.danger {
+  background: #eb445a;
+}
+
+.custom-btn.warning {
+  background: #ffc409;
+  color: #333;
+}
+
+.custom-btn:disabled,
+.custom-btn[disabled] {
+  background: #ccc;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.custom-btn:hover:not(:disabled) {
+  filter: brightness(0.95);
+}

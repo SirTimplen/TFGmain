@@ -38,7 +38,7 @@ interface MenuPage {
   ],
 })
 export class AppComponent implements OnInit{
-  public userType: 'usuario' | 'tutor' | 'tribunal' | null = null;
+  public userType: 'usuario' | 'tutor' | 'tribunal' |'admin' | null = null;
   
   public menus: { [key: string]: MenuPage[] } = {
   usuario: [
@@ -53,6 +53,10 @@ export class AppComponent implements OnInit{
     { title: 'Lineas de TFG', url: '/pages/lineas', icon: 'mail' },
     { title: 'Asignaciones', url: '/pages/outbox', icon: 'paper-plane' },
   ],
+  admin: [
+      { title: 'Administrar Líneas', url: '/admin', icon: 'settings' },
+      // Puedes añadir más opciones si lo deseas
+    ],
 };
 constructor(public globalService: GlobalService, private router: Router) {}
 

@@ -46,7 +46,10 @@ async crearLinea() {
     if (result.data) {
       const tutorEmail = await this.globalService.getUserEmail();
       if (tutorEmail) {
-        result.data.plazasOriginal = result.data.plazasLibres; // Asigna el valor de plazasOriginal
+        // Fuerza los campos a number
+        result.data.plazasLibres = Number(result.data.plazasLibres);
+        result.data.plazasOriginal = Number(result.data.plazasOriginal ?? result.data.plazasLibres);
+
         await this.globalService.crearLinea(result.data, tutorEmail);
         this.lineasTFG.push(result.data);
       } else {
@@ -59,21 +62,24 @@ async crearLinea() {
 }
 
   async editarLinea(linea: any) {
-    const modal = await this.modalController.create({
-      component: LineaFormComponent,
-      componentProps: { linea: { ...linea }, isEdit: true },
-    });
+  const modal = await this.modalController.create({
+    component: LineaFormComponent,
+    componentProps: { linea: { ...linea }, isEdit: true },
+  });
 
-    modal.onDidDismiss().then(async (result) => {
-      if (result.data) {
-        const index = this.lineasTFG.findIndex((l) => l === linea);
-        if (index > -1) {
-          this.lineasTFG[index] = result.data;
-          await this.globalService.actualizarLinea(linea.id, result.data);
-        }
+  modal.onDidDismiss().then(async (result) => {
+    if (result.data) {
+      // Fuerza los campos a number antes de actualizar
+      result.data.plazasLibres = Number(result.data.plazasLibres);
+      result.data.plazasOriginal = Number(result.data.plazasOriginal ?? result.data.plazasLibres);
+      const index = this.lineasTFG.findIndex((l) => l === linea);
+      if (index > -1) {
+        this.lineasTFG[index] = result.data;
+        await this.globalService.actualizarLinea(linea.id, result.data);
       }
-    });
+    }
+  });
 
-    await modal.present();
-  }
+  await modal.present();
+}
 }

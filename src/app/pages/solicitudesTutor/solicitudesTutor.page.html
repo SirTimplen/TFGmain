@@ -14,21 +14,25 @@
     </ion-list-header>
 
     <ion-item *ngFor="let solicitud of solicitudes">
-      <ion-label>
-        <h2>{{ solicitud.linea }}</h2>
-        <p><strong>Alumno:</strong> {{ solicitud.alumnoNombre }}</p>
-        <p><strong>Correo:</strong> {{ solicitud.alumnoCorreo }}</p>
-        <p><strong>Estado:</strong> {{ solicitud.estado }}</p>
-      </ion-label>
-      <ion-buttons slot="end">
-        <ion-button color="success" (click)="aceptarSolicitud(solicitud)" [disabled]="solicitud.estado === 'Aceptada'">
-          Aceptar
-        </ion-button>
-        <ion-button color="danger" (click)="rechazarSolicitud(solicitud)" [disabled]="solicitud.estado === 'Rechazada'">
-          Rechazar
-        </ion-button>
-      </ion-buttons>
-    </ion-item>
+  <ion-label>
+    <h2>{{ solicitud.linea }}</h2>
+    <p><strong>Alumno:</strong> {{ solicitud.alumnoNombre }}</p>
+    <p><strong>Correo:</strong> {{ solicitud.alumnoCorreo }}</p>
+    <p><strong>Estado:</strong> {{ solicitud.estado }}</p>
+  </ion-label>
+  <div style="display: flex; flex-direction: column; gap: 4px; margin-left: 10px;">
+    <button class="custom-btn success"
+            (click)="aceptarSolicitud(solicitud)"
+            [disabled]="solicitud.estado === 'Aceptada'">
+      Aceptar
+    </button>
+    <button class="custom-btn danger"
+            (click)="rechazarSolicitud(solicitud)"
+            [disabled]="solicitud.estado === 'Rechazada'">
+      Rechazar
+    </button>
+  </div>
+</ion-item>
 
     <ion-item *ngIf="solicitudes.length === 0">
       <ion-label>No hay solicitudes disponibles.</ion-label>

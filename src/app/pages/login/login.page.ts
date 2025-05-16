@@ -44,9 +44,10 @@ export class LoginPage {
 
   // Verifica si las credenciales son del administrador
   if (this.email === 'administrador@gmail.com' && this.password === 'administrador') {
-    this.router.navigate(['/admin']); // Redirige a la página de administración
-    return;
-  }
+  this.globalService.setUserType('admin'); // <-- Añade esto
+  this.router.navigate(['/admin']);
+  return;
+}
 
   try {
     const userType = await this.globalService.login(this.email, this.password);

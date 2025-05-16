@@ -27,9 +27,9 @@
     <p><strong>Descripción:</strong> {{ linea.descripcion || 'Sin descripción' }}</p>
     <p><strong>Plazas libres:</strong> {{ linea.plazasLibres || 0 }}</p>
   </ion-label>
-  <ion-button slot="end" color="primary" (click)="solicitarLinea(linea)">
+  <button class="custom-btn primary" (click)="solicitarLinea(linea)">
     Solicitar
-  </ion-button>
+  </button>
 </ion-item>
   </ion-list>
 </ion-content>
