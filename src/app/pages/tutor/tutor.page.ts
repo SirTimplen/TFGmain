@@ -82,4 +82,10 @@ async crearLinea() {
 
   await modal.present();
 }
+async borrarLinea(linea: any) {
+  if (confirm('¿Seguro que quieres borrar esta línea?')) {
+    await this.globalService.borrarLinea(linea.id);
+    this.lineasTFG = this.lineasTFG.filter(l => l.id !== linea.id);
+  }
+}
 }

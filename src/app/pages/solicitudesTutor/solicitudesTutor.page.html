@@ -8,34 +8,27 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-list>
-    <ion-list-header>
-      <ion-label>Solicitudes de Líneas de TFG</ion-label>
-    </ion-list-header>
-
-    <ion-item *ngFor="let solicitud of solicitudes">
-  <ion-label>
-    <h2>{{ solicitud.linea }}</h2>
-    <p><strong>Alumno:</strong> {{ solicitud.alumnoNombre }}</p>
-    <p><strong>Correo:</strong> {{ solicitud.alumnoCorreo }}</p>
-    <p><strong>Estado:</strong> {{ solicitud.estado }}</p>
-  </ion-label>
-  <div style="display: flex; flex-direction: column; gap: 4px; margin-left: 10px;">
-    <button class="custom-btn success"
-            (click)="aceptarSolicitud(solicitud)"
-            [disabled]="solicitud.estado === 'Aceptada'">
-      Aceptar
-    </button>
-    <button class="custom-btn danger"
-            (click)="rechazarSolicitud(solicitud)"
-            [disabled]="solicitud.estado === 'Rechazada'">
-      Rechazar
-    </button>
+  <div class="lineas-container">
+    <div class="linea-card" *ngFor="let solicitud of solicitudes">
+      <h2>{{ solicitud.linea }}</h2>
+      <p><strong>Alumno:</strong> {{ solicitud.alumnoNombre }}</p>
+      <p><strong>Correo:</strong> {{ solicitud.alumnoCorreo }}</p>
+      <p><strong>Estado:</strong> {{ solicitud.estado }}</p>
+      <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 8px;">
+        <button class="custom-btn success"
+                (click)="aceptarSolicitud(solicitud)"
+                [disabled]="solicitud.estado === 'Aceptada'">
+          Aceptar
+        </button>
+        <button class="custom-btn danger"
+                (click)="rechazarSolicitud(solicitud)"
+                [disabled]="solicitud.estado === 'Rechazada'">
+          Rechazar
+        </button>
+      </div>
+    </div>
+    <div *ngIf="solicitudes.length === 0" class="linea-card" style="text-align:center;">
+      No hay solicitudes disponibles.
+    </div>
   </div>
-</ion-item>
-
-    <ion-item *ngIf="solicitudes.length === 0">
-      <ion-label>No hay solicitudes disponibles.</ion-label>
-    </ion-item>
-  </ion-list>
 </ion-content>

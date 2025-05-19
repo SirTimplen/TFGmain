@@ -41,4 +41,14 @@ export class SolicitudesPage implements OnInit {
       console.error('Error al cargar las solicitudes:', error);
     });
 }
+async cancelarSolicitud(solicitud: any) {
+  if (!confirm('¿Seguro que quieres cancelar esta solicitud?')) return;
+  try {
+    await this.globalService.cancelarSolicitud(solicitud.id);
+    this.solicitudes = this.solicitudes.filter(s => s.id !== solicitud.id);
+  } catch (error) {
+    alert('Error al cancelar la solicitud');
+    console.error(error);
+  }
+}
 }

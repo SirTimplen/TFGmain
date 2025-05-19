@@ -14,22 +14,16 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-list>
-    <ion-list-header>
-      <ion-label>Lista de Líneas de TFG</ion-label>
-    </ion-list-header>
-
-    <ion-item *ngFor="let linea of lineasTFG">
-  <ion-label>
-    <h2>{{ linea.titulo || 'Sin título' }}</h2>
-    <p><strong>Tutor:</strong> {{ linea.tutor || 'Sin tutor' }}</p>
-    <p><strong>Ámbito:</strong> {{ linea.ambito || 'Sin ámbito' }}</p>
-    <p><strong>Descripción:</strong> {{ linea.descripcion || 'Sin descripción' }}</p>
-    <p><strong>Plazas libres:</strong> {{ linea.plazasLibres || 0 }}</p>
-  </ion-label>
-  <button class="custom-btn primary" (click)="solicitarLinea(linea)">
-    Solicitar
-  </button>
-</ion-item>
-  </ion-list>
+  <div class="lineas-container">
+    <div class="linea-card" *ngFor="let linea of lineasTFG">
+      <h2>{{ linea.titulo || 'Sin título' }}</h2>
+      <p><strong>Tutor:</strong> {{ linea.tutor || 'Sin tutor' }}</p>
+      <p><strong>Ámbito:</strong> {{ linea.ambito || 'Sin ámbito' }}</p>
+      <p><strong>Descripción:</strong> {{ linea.descripcion || 'Sin descripción' }}</p>
+      <p><strong>Plazas libres:</strong> {{ linea.plazasLibres || 0 }}</p>
+      <button class="custom-btn primary" (click)="solicitarLinea(linea)">
+        Solicitar
+      </button>
+    </div>
+  </div>
 </ion-content>

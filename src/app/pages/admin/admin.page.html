@@ -1,63 +1,68 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button> <!-- Botón para abrir el menú -->
+      <ion-menu-button></ion-menu-button> 
     </ion-buttons>
     <ion-title>Administrador de lineas</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <!-- Botón para mostrar el formulario de nueva línea -->
   <button class="custom-btn" (click)="mostrarFormulario = !mostrarFormulario">
     {{ mostrarFormulario ? 'Ocultar formulario' : 'Crear Nueva Línea' }}
   </button>
 
-  <!-- Formulario de nueva línea, visible solo si mostrarFormulario es true -->
-  <ion-list *ngIf="mostrarFormulario">
-    <ion-list-header>
-      <ion-label>Crear Nueva Línea</ion-label>
-    </ion-list-header>
-    <ion-item>
-      <ion-input placeholder="Título" [(ngModel)]="nuevaLinea.titulo"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-input placeholder="Ámbito" [(ngModel)]="nuevaLinea.ambito"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-textarea placeholder="Descripción" [(ngModel)]="nuevaLinea.descripcion"></ion-textarea>
-    </ion-item>
-    <ion-item>
-      <ion-input type="number" placeholder="Plazas Libres" [(ngModel)]="nuevaLinea.plazasLibres"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-input type="number" placeholder="Plazas Original" [(ngModel)]="nuevaLinea.plazasOriginal"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-input placeholder="Tutor" [(ngModel)]="nuevaLinea.tutor"></ion-input>
-    </ion-item>
-    <button class="custom-btn" (click)="crearLinea()">Crear Línea</button>
-  </ion-list>
+<form 
+  *ngIf="mostrarFormulario" 
+  (ngSubmit)="crearLinea()" 
+  class="linea-card" 
+  style="max-width: 400px; margin: 24px auto 16px auto; box-shadow: 0 2px 12px rgba(56,128,255,0.08);"
+>
+  <h3 style="margin-bottom: 16px; color: #3880ff;">Crear Nueva Línea</h3>
+  <div class="form-group">
+    <label for="titulo">Título:</label>
+    <input id="titulo" type="text" placeholder="Título" [(ngModel)]="nuevaLinea.titulo" name="titulo" required>
+  </div>
+  <div class="form-group">
+    <label for="ambito">Ámbito:</label>
+    <input id="ambito" type="text" placeholder="Ámbito" [(ngModel)]="nuevaLinea.ambito" name="ambito" required>
+  </div>
+  <div class="form-group">
+    <label for="descripcion">Descripción:</label>
+    <textarea id="descripcion" placeholder="Descripción" [(ngModel)]="nuevaLinea.descripcion" name="descripcion" required></textarea>
+  </div>
+  <div class="form-group">
+    <label for="plazasLibres">Plazas Libres:</label>
+    <input id="plazasLibres" type="number" placeholder="Plazas Libres" [(ngModel)]="nuevaLinea.plazasLibres" name="plazasLibres" required>
+  </div>
+  <div class="form-group">
+    <label for="plazasOriginal">Plazas Original:</label>
+    <input id="plazasOriginal" type="number" placeholder="Plazas Original" [(ngModel)]="nuevaLinea.plazasOriginal" name="plazasOriginal" required>
+  </div>
+  <div class="form-group">
+    <label for="tutor">Tutor:</label>
+    <input id="tutor" type="text" placeholder="Tutor" [(ngModel)]="nuevaLinea.tutor" name="tutor" required>
+  </div>
+  <button class="custom-btn" type="submit" style="width: 100%; margin-top: 12px;">Crear Línea</button>
+</form>
 
-  <ion-list>
-    <ion-list-header>
-      <ion-label>Todas las Líneas</ion-label>
-      <button class="custom-btn warning" (click)="resetPlazasTodas()">Resetear plazas de todas</button>
-    </ion-list-header>
-    <ion-item *ngFor="let linea of lineas">
-      <ion-label>
-        <h2>{{ linea.titulo }}</h2>
-        <p><strong>Ámbito:</strong> {{ linea.ambito }}</p>
-        <p><strong>Descripción:</strong> {{ linea.descripcion }}</p>
-        <p><strong>Plazas libres:</strong> {{ linea.plazasLibres }}</p>
-        <p><strong>Plazas original:</strong> {{ linea.plazasOriginal }}</p>
-        <p><strong>Tutor:</strong> {{ linea.tutor }}</p>
-      </ion-label>
-      <div style="display: flex; flex-direction: column; gap: 4px; margin-left: 10px;">
-        <button class="custom-btn primary" (click)="editarLinea(linea)">Editar</button>
-        <button class="custom-btn danger" (click)="borrarLinea(linea)">Borrar</button>
-        <button class="custom-btn" (click)="resetPlazas(linea)">Resetear plazas</button>
-      </div>
-    </ion-item>
-  </ion-list>
+<div style=" margin: 16px 0;">
+  <button class="custom-btn warning" (click)="resetPlazasTodas()">Resetear plazas de todas</button>
+</div>
+<div class="lineas-container">
+  <div class="linea-card" *ngFor="let linea of lineas">
+    <h2>{{ linea.titulo }}</h2>
+    <p><strong>Ámbito:</strong> {{ linea.ambito }}</p>
+    <p><strong>Descripción:</strong> {{ linea.descripcion }}</p>
+    <p><strong>Plazas libres:</strong> {{ linea.plazasLibres }}</p>
+    <p><strong>Plazas original:</strong> {{ linea.plazasOriginal }}</p>
+    <p><strong>Tutor:</strong> {{ linea.tutor }}</p>
+    <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 8px;">
+      <button class="custom-btn primary" (click)="editarLinea(linea)">Editar</button>
+      <button class="custom-btn danger" (click)="borrarLinea(linea)">Borrar</button>
+      <button class="custom-btn" (click)="resetPlazas(linea)">Resetear plazas</button>
+    </div>
+  </div>
+</div>
+
 </ion-content>

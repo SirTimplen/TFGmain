@@ -26,24 +26,24 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" id="main-content">
-  <ion-list>
-    <ion-list-header>
-      <ion-label>Solicitudes de TFG</ion-label>
-    </ion-list-header>
-
-<ion-item *ngFor="let solicitud of solicitudes">
-  <ion-label>
-    <h2>Línea: {{ solicitud.linea }}</h2>
-    <p><strong>Tutor:</strong> {{ solicitud.tutor }}</p>
-    <p><strong>Usuario:</strong> {{ solicitud.usuario }}</p>
-    <p><strong>Fecha:</strong> {{ solicitud.fecha | date }}</p>
-    <p><strong>Estado:</strong> {{ solicitud.estado }}</p>
-  </ion-label>
-</ion-item>
-
-<ion-item *ngIf="solicitudes.length === 0">
-  <ion-label>No hay solicitudes disponibles.</ion-label>
-</ion-item>
-
-  </ion-list>
+  <div class="lineas-container">
+    <div class="linea-card" *ngFor="let solicitud of solicitudes">
+      <h2>Línea: {{ solicitud.linea }}</h2>
+      <p><strong>Tutor:</strong> {{ solicitud.tutor }}</p>
+      <p><strong>Usuario:</strong> {{ solicitud.usuario }}</p>
+      <p><strong>Fecha:</strong> {{ solicitud.fecha | date }}</p>
+      <p><strong>Estado:</strong> {{ solicitud.estado }}</p>
+      <button
+        *ngIf="solicitud.estado === 'Pendiente'"
+        class="custom-btn danger"
+        (click)="cancelarSolicitud(solicitud)"
+        style="margin-top: 8px;"
+      >
+        Cancelar Solicitud
+      </button>
+    </div>
+    <div *ngIf="solicitudes.length === 0" class="linea-card" style="text-align:center;">
+      No hay solicitudes disponibles.
+    </div>
+  </div>
 </ion-content>

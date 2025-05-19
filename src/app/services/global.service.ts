@@ -332,4 +332,14 @@ async borrarLinea(lineaId: string): Promise<void> {
     throw error;
   }
 }
+async cancelarSolicitud(solicitudId: string): Promise<void> {
+  try {
+    const solicitudRef = doc(this.db, 'Solicitud', solicitudId);
+    await deleteDoc(solicitudRef);
+    console.log('Solicitud cancelada con éxito');
+  } catch (error) {
+    console.error('Error al cancelar la solicitud:', error);
+    throw error;
+  }
+}
 }

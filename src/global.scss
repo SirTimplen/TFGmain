@@ -77,3 +77,42 @@
 .custom-btn:hover:not(:disabled) {
   filter: brightness(0.95);
 }
+// Puedes poner esto en global.scss o usuario.page.scss
+
+.lineas-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  padding: 24px 8px;
+}
+
+.linea-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  padding: 20px 24px;
+  max-width: 350px;
+  min-width: 260px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+  transition: box-shadow 0.2s;
+}
+
+.linea-card:hover {
+  box-shadow: 0 4px 20px rgba(56,128,255,0.15);
+}
+
+.linea-card h2 {
+  margin: 0 0 8px 0;
+  font-size: 1.3em;
+  color: #3880ff;
+}
+
+.linea-card p {
+  margin: 0 0 4px 0;
+  font-size: 1em;
+}

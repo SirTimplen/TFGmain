@@ -1,36 +1,32 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>{{ isEdit ? 'Editar Línea' : 'Crear Nueva Línea' }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="dismiss()">Cerrar</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<div class="modal-header">
+  <h2>{{ isEdit ? 'Editar Línea' : 'Crear Nueva Línea' }}</h2>
+  <button type="button" class="custom-btn danger" (click)="dismiss()">Cerrar</button>
+</div>
 
-<ion-content>
+<div class="modal-content">
   <form (ngSubmit)="submitForm()">
-    <ion-item>
-      <ion-label position="stacked">Título</ion-label>
-      <ion-input [(ngModel)]="linea.titulo" name="titulo" required></ion-input>
-    </ion-item>
+    <div class="form-group">
+      <label for="titulo">Título</label>
+      <input id="titulo" [(ngModel)]="linea.titulo" name="titulo" required />
+    </div>
 
-    <ion-item>
-      <ion-label position="stacked">Ámbito</ion-label>
-      <ion-input [(ngModel)]="linea.ambito" name="ambito" required></ion-input>
-    </ion-item>
+    <div class="form-group">
+      <label for="ambito">Ámbito</label>
+      <input id="ambito" [(ngModel)]="linea.ambito" name="ambito" required />
+    </div>
 
-    <ion-item>
-      <ion-label position="stacked">Descripción</ion-label>
-      <ion-textarea [(ngModel)]="linea.descripcion" name="descripcion" required></ion-textarea>
-    </ion-item>
+    <div class="form-group">
+      <label for="descripcion">Descripción</label>
+      <textarea id="descripcion" [(ngModel)]="linea.descripcion" name="descripcion" required></textarea>
+    </div>
 
-    <ion-item>
-      <ion-label position="stacked">Plazas Libres</ion-label>
-      <ion-input type="number" [(ngModel)]="linea.plazasLibres" name="plazasLibres" required></ion-input>
-    </ion-item>
+    <div class="form-group">
+      <label for="plazasLibres">Plazas Libres</label>
+      <input id="plazasLibres" type="number" [(ngModel)]="linea.plazasLibres" name="plazasLibres" required />
+    </div>
 
-    <ion-button expand="block" type="submit" color="success">
+    <button class="custom-btn success" type="submit">
       {{ isEdit ? 'Guardar Cambios' : 'Crear Línea' }}
-    </ion-button>
+    </button>
   </form>
-</ion-content>
+</div>
