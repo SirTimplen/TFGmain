@@ -1,6 +1,6 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonicModule, IonInput } from '@ionic/angular';
+import { IonButton, IonInput } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { GlobalService } from '../../services/global.service';
@@ -9,7 +9,8 @@ import { GlobalService } from '../../services/global.service';
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
-  imports: [IonicModule, FormsModule, CommonModule],
+  standalone: true,
+  imports: [ IonButton,IonInput,FormsModule, CommonModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class LoginPage {

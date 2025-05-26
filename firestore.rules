@@ -7,7 +7,7 @@ service cloud.firestore {
     match /Tutor/{document=**} {
       allow read, write: if true; // Cambiar para producción
     }
-    match /Linea/{document=**} {
+    match /ingenieria_informatica/grado2024-2025/linea/{document=**} {
       allow read,write: if true; // Permitir lectura a todos (solo para pruebas)
     }
     match /Solicitud/{document=**} {

@@ -1,8 +1,7 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { IonicModule } from '@ionic/angular';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GlobalService } from '../../services/global.service'; // Asegúrate de que la ruta sea correcta
+import { IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton } from '@ionic/angular/standalone';
+import { GlobalService } from '../../services/global.service';
 
 @Component({
   selector: 'app-usuario',
@@ -10,8 +9,18 @@ import { GlobalService } from '../../services/global.service'; // Asegúrate de 
   styleUrls: ['./usuario.page.scss'],
   standalone: true,
   imports: [
-    IonicModule, // Importa los componentes de Ionic
-    CommonModule, // Importa CommonModule para habilitar directivas como *ngFor y *ngIf
+    CommonModule,
+    IonHeader,
+    IonToolbar,
+    IonButtons,
+    IonMenuButton,
+    IonTitle,
+    IonContent,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
+    IonButton,
   ],
 })
 export class UsuarioPage implements OnInit {

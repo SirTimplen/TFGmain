@@ -1,15 +1,27 @@
 import { Component, OnInit } from '@angular/core';
-import { GlobalService } from '../../services/global.service';
-import {IonicModule} from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton } from '@ionic/angular/standalone';
+import { GlobalService } from '../../services/global.service';
 
 @Component({
   selector: 'app-solicitudes-tutor',
   templateUrl: './solicitudesTutor.page.html',
   styleUrls: ['./solicitudesTutor.page.scss'],
-  imports: [IonicModule, CommonModule, RouterModule],
   standalone: true,
+  imports: [
+    CommonModule,
+    IonHeader,
+    IonToolbar,
+    IonButtons,
+    IonMenuButton,
+    IonTitle,
+    IonContent,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
+    IonButton,
+  ],
 })
 export class SolicitudesTutorPage implements OnInit {
   public solicitudes: any[] = [];
@@ -17,34 +29,18 @@ export class SolicitudesTutorPage implements OnInit {
   constructor(private globalService: GlobalService) {}
 
   async ngOnInit() {
-    try {
-      const tutorEmail = await this.globalService.getUserEmail();
-      if (!tutorEmail) {
-        console.error('No se pudo obtener el correo del tutor');
-        return;
-      }
-
-      this.solicitudes = await this.globalService.obtenerSolicitudesPorTutor(tutorEmail);
-    } catch (error) {
-      console.error('Error al cargar las solicitudes:', error);
-    }
+    const tutorEmail = await this.globalService.getUserEmail();
+    if (!tutorEmail) return;
+    this.solicitudes = await this.globalService.obtenerSolicitudesPorTutor(tutorEmail);
   }
 
   async aceptarSolicitud(solicitud: any) {
-    try {
-      await this.globalService.actualizarEstadoSolicitud(solicitud.id, 'Aceptada');
-      solicitud.estado = 'Aceptada';
-    } catch (error) {
-      console.error('Error al aceptar la solicitud:', error);
-    }
+    await this.globalService.actualizarEstadoSolicitud(solicitud.id, 'Aceptada');
+    solicitud.estado = 'Aceptada';
   }
 
   async rechazarSolicitud(solicitud: any) {
-    try {
-      await this.globalService.actualizarEstadoSolicitud(solicitud.id, 'Rechazada');
-      solicitud.estado = 'Rechazada';
-    } catch (error) {
-      console.error('Error al rechazar la solicitud:', error);
-    }
+    await this.globalService.actualizarEstadoSolicitud(solicitud.id, 'Rechazada');
+    solicitud.estado = 'Rechazada';
   }
 }

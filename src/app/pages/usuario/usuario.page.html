@@ -8,22 +8,20 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Usuario</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
   <div class="lineas-container">
-    <div class="linea-card" *ngFor="let linea of lineasTFG">
-      <h2>{{ linea.titulo || 'Sin título' }}</h2>
-      <p><strong>Tutor:</strong> {{ linea.tutor || 'Sin tutor' }}</p>
-      <p><strong>Ámbito:</strong> {{ linea.ambito || 'Sin ámbito' }}</p>
-      <p><strong>Descripción:</strong> {{ linea.descripcion || 'Sin descripción' }}</p>
-      <p><strong>Plazas libres:</strong> {{ linea.plazasLibres || 0 }}</p>
-      <button class="custom-btn primary" (click)="solicitarLinea(linea)">
-        Solicitar
-      </button>
-    </div>
+    <ion-card *ngFor="let linea of lineasTFG">
+      <ion-card-header>
+        <ion-card-title>{{ linea.titulo || 'Sin título' }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p><strong>Tutor:</strong> {{ linea.tutor || 'Sin tutor' }}</p>
+        <p><strong>Ámbito:</strong> {{ linea.ambito || 'Sin ámbito' }}</p>
+        <p><strong>Descripción:</strong> {{ linea.descripcion || 'Sin descripción' }}</p>
+        <p><strong>Plazas libres:</strong> {{ linea.plazasLibres || 0 }}</p>
+        <ion-button expand="block" color="primary" (click)="solicitarLinea(linea)">
+          Solicitar
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
   </div>
 </ion-content>

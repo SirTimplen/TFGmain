@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonButton, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonInput, IonTextarea, IonToolbar, IonButtons, IonMenuButton, IonHeader, IonTitle, IonContent } from '@ionic/angular/standalone';
 import { LineaFormComponent } from '../../components/linea-form/linea-form.component';
-import { ModalController } from '@ionic/angular';
-import { GlobalService } from '../../services/global.service'; // Asegúrate de que la ruta sea correcta
+import { ModalController } from '@ionic/angular/standalone';
+import { GlobalService } from '../../services/global.service';
 
 @Component({
   selector: 'app-tutor',
@@ -12,9 +12,21 @@ import { GlobalService } from '../../services/global.service'; // Asegúrate de 
   styleUrls: ['./tutor.page.scss'],
   standalone: true,
   imports: [
-    IonicModule, // Importa todos los componentes de Ionic desde aquí
     CommonModule,
     FormsModule,
+    IonButton,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
+    IonInput,
+    IonTextarea,
+    IonToolbar,
+    IonButtons,
+    IonMenuButton,
+    IonHeader,
+    IonTitle,
+    IonContent,
     LineaFormComponent,
   ],
 })

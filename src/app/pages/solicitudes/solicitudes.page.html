@@ -27,23 +27,24 @@
 
 <ion-content [fullscreen]="true" id="main-content">
   <div class="lineas-container">
-    <div class="linea-card" *ngFor="let solicitud of solicitudes">
-      <h2>Línea: {{ solicitud.linea }}</h2>
-      <p><strong>Tutor:</strong> {{ solicitud.tutor }}</p>
-      <p><strong>Usuario:</strong> {{ solicitud.usuario }}</p>
-      <p><strong>Fecha:</strong> {{ solicitud.fecha | date }}</p>
-      <p><strong>Estado:</strong> {{ solicitud.estado }}</p>
-      <button
-        *ngIf="solicitud.estado === 'Pendiente'"
-        class="custom-btn danger"
-        (click)="cancelarSolicitud(solicitud)"
-        style="margin-top: 8px;"
-      >
-        Cancelar Solicitud
-      </button>
-    </div>
-    <div *ngIf="solicitudes.length === 0" class="linea-card" style="text-align:center;">
-      No hay solicitudes disponibles.
-    </div>
+    <ion-card *ngFor="let solicitud of solicitudes">
+      <ion-card-header>
+        <ion-card-title>Línea: {{ solicitud.linea }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p><strong>Tutor:</strong> {{ solicitud.tutor }}</p>
+        <p><strong>Usuario:</strong> {{ solicitud.usuario }}</p>
+        <p><strong>Fecha:</strong> {{ solicitud.fecha | date }}</p>
+        <p><strong>Estado:</strong> {{ solicitud.estado }}</p>
+        <ion-button *ngIf="solicitud.estado === 'Pendiente'" color="danger" expand="block" (click)="cancelarSolicitud(solicitud)">
+          Cancelar Solicitud
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+    <ion-card *ngIf="solicitudes.length === 0">
+      <ion-card-content style="text-align:center;">
+        No hay solicitudes disponibles.
+      </ion-card-content>
+    </ion-card>
   </div>
 </ion-content>

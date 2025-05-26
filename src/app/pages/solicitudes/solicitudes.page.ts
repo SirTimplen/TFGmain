@@ -1,54 +1,49 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonMenu, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonMenuToggle, IonItem, IonIcon, IonLabel, IonButtons, IonMenuButton, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton } from '@ionic/angular/standalone';
 import { RouterModule } from '@angular/router';
-import { AppComponent } from '../../app.component'; // Importa AppComponent
-import { GlobalService } from '../../services/global.service'; // Asegúrate de que la ruta sea correcta
-
-interface MenuPage {
-  title: string;
-  url: string;
-  icon: string;
-}
+import { GlobalService } from '../../services/global.service';
 
 @Component({
   selector: 'app-solicitudes',
   templateUrl: './solicitudes.page.html',
   styleUrls: ['./solicitudes.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, RouterModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    IonMenu,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonList,
+    IonMenuToggle,
+    IonItem,
+    IonIcon,
+    IonLabel,
+    IonButtons,
+    IonMenuButton,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
+    IonButton,
+  ],
 })
 export class SolicitudesPage implements OnInit {
-  public solicitudes: any[] = []; // Cambia el tipo según tu necesidad
+  public solicitudes: any[] = [];
+  public appPages: any[] = [];
 
-  public appPages: MenuPage[] = []; // Define el tipo explícito
+  constructor(private globalService: GlobalService) {}
 
-  constructor(private appComponent: AppComponent,private globalService: GlobalService) {} // Inyecta AppComponent
-
-  ngOnInit() {
-  const usuario = this.appComponent.userType; // Obtén el correo del usuario autenticado
-  if (!usuario) {
-    console.error('Usuario no autenticado');
-    return;
+  async ngOnInit() {
+    this.solicitudes = await this.globalService.obtenerSolicitudes();
   }
 
-  this.globalService
-    .obtenerSolicitudes()
-    .then((solicitudes) => {
-      this.solicitudes = solicitudes;
-    })
-    .catch((error) => {
-      console.error('Error al cargar las solicitudes:', error);
-    });
-}
-async cancelarSolicitud(solicitud: any) {
-  if (!confirm('¿Seguro que quieres cancelar esta solicitud?')) return;
-  try {
+  async cancelarSolicitud(solicitud: any) {
+    if (!confirm('¿Seguro que quieres cancelar esta solicitud?')) return;
     await this.globalService.cancelarSolicitud(solicitud.id);
     this.solicitudes = this.solicitudes.filter(s => s.id !== solicitud.id);
-  } catch (error) {
-    alert('Error al cancelar la solicitud');
-    console.error(error);
   }
-}
 }

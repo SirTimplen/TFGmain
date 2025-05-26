@@ -8,19 +8,23 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <button class="custom-btn success" style="width: 100%; margin-top: 16px;" (click)="crearLinea()">
+  <ion-button expand="block" color="success" style="margin-top: 16px;" (click)="crearLinea()">
     Crear Nueva Línea
-  </button>
+  </ion-button>
   <div class="lineas-container">
-    <div class="linea-card" *ngFor="let linea of lineasTFG">
-      <h2>{{ linea.titulo || 'Sin título' }}</h2>
-      <p><strong>Ámbito:</strong> {{ linea.ambito || 'Sin ámbito' }}</p>
-      <p><strong>Descripción:</strong> {{ linea.descripcion || 'Sin descripción' }}</p>
-      <p><strong>Plazas libres:</strong> {{ linea.plazasLibres || 0 }}</p>
-      <div style="display: flex; gap: 8px; margin-top: 8px;">
-        <button class="custom-btn primary" (click)="editarLinea(linea)">Editar</button>
-        <button class="custom-btn danger" (click)="borrarLinea(linea)">Borrar</button>
-      </div>
-    </div>
+    <ion-card *ngFor="let linea of lineasTFG">
+      <ion-card-header>
+        <ion-card-title>{{ linea.titulo || 'Sin título' }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p><strong>Ámbito:</strong> {{ linea.ambito || 'Sin ámbito' }}</p>
+        <p><strong>Descripción:</strong> {{ linea.descripcion || 'Sin descripción' }}</p>
+        <p><strong>Plazas libres:</strong> {{ linea.plazasLibres || 0 }}</p>
+        <div style="display: flex; gap: 8px; margin-top: 8px;">
+          <ion-button color="primary" (click)="editarLinea(linea)">Editar</ion-button>
+          <ion-button color="danger" (click)="borrarLinea(linea)">Borrar</ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
   </div>
 </ion-content>
