@@ -20,6 +20,7 @@
         <p><strong>Ámbito:</strong> {{ linea.ambito || 'Sin ámbito' }}</p>
         <p><strong>Descripción:</strong> {{ linea.descripcion || 'Sin descripción' }}</p>
         <p><strong>Plazas libres:</strong> {{ linea.plazasLibres || 0 }}</p>
+        <p><strong>Plazas originales:</strong>{{linea.plazasOriginal || 0}}</p>
         <div style="display: flex; gap: 8px; margin-top: 8px;">
           <ion-button color="primary" (click)="editarLinea(linea)">Editar</ion-button>
           <ion-button color="danger" (click)="borrarLinea(linea)">Borrar</ion-button>

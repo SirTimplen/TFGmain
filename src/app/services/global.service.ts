@@ -9,6 +9,9 @@ import { deleteDoc } from 'firebase/firestore';
   providedIn: 'root',
 })
 export class GlobalService {
+  private pathLineas = '/ingenieria_informatica/grado2024-2025/linea';
+  private pathSolicitudes = '/ingenieria_informatica/grado2024-2025/solicitud';
+
   private userType: 'usuario' | 'tutor' | 'tribunal' |'admin' | null = null;
   private userTypeSubject = new BehaviorSubject<'usuario' | 'tutor' | 'tribunal' |'admin' | null>(null);
   userType$ = this.userTypeSubject.asObservable();
@@ -64,7 +67,7 @@ async login(email: string, password: string): Promise<'usuario' | 'tutor' | 'tri
   private db = getFirestore();
   async obtenerLineas(): Promise<any[]> {
   try {
-    const lineasRef = collection(this.db, 'Linea');
+    const lineasRef = collection(this.db, this.pathLineas);
     const snapshot = await getDocs(lineasRef);
 
     // Mapea los datos y asegúrate de que todos los campos estén presentes
@@ -92,7 +95,7 @@ async obtenerSolicitudes(): Promise<any[]> {
       throw new Error('Usuario no autenticado');
     }
 
-    const solicitudesRef = collection(this.db, 'Solicitud');
+    const solicitudesRef = collection(this.db, this.pathSolicitudes);
     const usuarioQuery = query(solicitudesRef, where('usuario', '==', userEmail)); // Filtra por el correo del usuario
     const snapshot = await getDocs(usuarioQuery);
 
@@ -101,7 +104,7 @@ async obtenerSolicitudes(): Promise<any[]> {
         const data = docSnapshot.data();
 
         // Obtén el nombre de la línea
-        const lineaDoc = await getDoc(doc(this.db, 'Linea', data['linea']));
+        const lineaDoc = await getDoc(doc(this.db, this.pathLineas, this.pathLineas));
         const lineaNombre = lineaDoc.exists() ? lineaDoc.data()?.['titulo'] || 'Sin título' : 'Sin título';
 
         // Obtén el nombre del tutor
@@ -140,16 +143,17 @@ getUserType(): 'usuario' | 'tutor' | 'tribunal' |'admin' | null {
   }
 async crearLinea(linea: any, tutorEmail: string): Promise<void> {
   try {
-    const lineasRef = collection(this.db, 'Linea');
+    const lineasRef = collection(this.db, this.pathLineas);
     // Asegura que los campos sean number
-    const plazasLibres = Number(linea.plazasLibres);
-    const plazasOriginal = Number(linea.plazasOriginal ?? linea.plazasLibres);
-
+    const plazasOriginal = Number(linea.plazasOriginal);
+    const alumnos: string[] = [];
+    const plazasLibres = plazasOriginal - alumnos.length;
     await addDoc(lineasRef, {
       ...linea,
       tutor: tutorEmail,
       plazasLibres,
       plazasOriginal,
+      alumnos
     });
     console.log('Línea creada con éxito');
   } catch (error) {
@@ -159,7 +163,7 @@ async crearLinea(linea: any, tutorEmail: string): Promise<void> {
 }
 async obtenerLineasPorTutor(tutorId: string): Promise<any[]> {
   try {
-    const lineasRef = collection(this.db, 'Linea');
+    const lineasRef = collection(this.db, this.pathLineas);
     const tutorQuery = query(lineasRef, where('tutor', '==', tutorId)); // Filtra por la ID del tutor
     const snapshot = await getDocs(tutorQuery);
     return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })); // Incluye el ID del documento
@@ -170,14 +174,24 @@ async obtenerLineasPorTutor(tutorId: string): Promise<any[]> {
 }
 async actualizarLinea(lineaId: string, linea: any): Promise<void> {
   try {
-    const lineaRef = doc(this.db, 'Linea', lineaId);
-    // Fuerza los campos a number antes de actualizar
-    if (linea.plazasLibres !== undefined) {
-      linea.plazasLibres = Number(linea.plazasLibres);
+    const lineaRef = doc(this.db, this.pathLineas, lineaId);
+    const lineaSnapshot = await getDoc(lineaRef);
+
+    if (!lineaSnapshot.exists()) {
+      throw new Error('Línea no encontrada');
     }
+
+    const lineaData = lineaSnapshot.data();
+    const alumnos = lineaData['alumnos'] || [];
+
+    // Fuerza los campos a number antes de actualizar
     if (linea.plazasOriginal !== undefined) {
       linea.plazasOriginal = Number(linea.plazasOriginal);
     }
+
+    // Recalcula las plazas libres
+    linea.plazasLibres = linea.plazasOriginal - alumnos.length;
+
     await updateDoc(lineaRef, linea);
     console.log('Línea actualizada con éxito');
   } catch (error) {
@@ -199,7 +213,7 @@ async getUserEmail(): Promise<string | null> {
 }
 async obtenerSolicitudesPorTutor(tutorEmail: string): Promise<any[]> {
   try {
-    const solicitudesRef = collection(this.db, 'Solicitud');
+    const solicitudesRef = collection(this.db, this.pathSolicitudes);
     const tutorQuery = query(solicitudesRef, where('tutor', '==', tutorEmail));
     const snapshot = await getDocs(tutorQuery);
 
@@ -213,7 +227,7 @@ async obtenerSolicitudesPorTutor(tutorEmail: string): Promise<any[]> {
         const alumno = usuarioSnapshot.docs[0]?.data() || {};
 
         // Obtén el título de la línea
-        const lineaDoc = await getDoc(doc(this.db, 'Linea', data['linea']));
+        const lineaDoc = await getDoc(doc(this.db, this.pathLineas, data['linea']));
         const lineaTitulo = lineaDoc.exists() ? lineaDoc.data()?.['titulo'] || 'Sin título' : 'Sin título';
 
         return {
@@ -235,14 +249,14 @@ async obtenerSolicitudesPorTutor(tutorEmail: string): Promise<any[]> {
 
 async actualizarEstadoSolicitud(solicitudId: string, estado: string): Promise<void> {
   try {
-    const solicitudRef = doc(this.db, 'Solicitud', solicitudId);
+    const solicitudRef = doc(this.db, this.pathSolicitudes, solicitudId);
     const solicitudSnapshot = await getDoc(solicitudRef);
     if (!solicitudSnapshot.exists()) {
       throw new Error('Solicitud no encontrada');
     }
 
     const solicitudData = solicitudSnapshot.data();
-    const lineaRef = doc(this.db, 'Linea', solicitudData['linea']);
+    const lineaRef = doc(this.db, this.pathLineas, solicitudData['linea']);
     const lineaSnapshot = await getDoc(lineaRef);
 
     if (!lineaSnapshot.exists()) {
@@ -250,23 +264,31 @@ async actualizarEstadoSolicitud(solicitudId: string, estado: string): Promise<vo
     }
 
     const lineaData = lineaSnapshot.data();
-    let plazasLibres = lineaData['plazasLibres'];
+    const alumnos = lineaData['alumnos'] || [];
 
     if (estado === 'Aceptada' && solicitudData['estado'] !== 'Aceptada') {
-      if (plazasLibres > 0) {
-        plazasLibres -= 1;
+      if (lineaData['plazasLibres'] > 0) {
+        // Añade el correo del alumno al array de alumnos
+        alumnos.push(solicitudData['usuario']);
       } else {
         throw new Error('No hay plazas disponibles');
       }
-    } else if (estado === 'Rechazada' && solicitudData['estado'] === 'Aceptada') {
-      plazasLibres += 1;
+    } else if (estado === 'Rechazada por tutor' && solicitudData['estado'] === 'Aceptada') {
+      // Remueve el correo del alumno del array de alumnos si existe
+      const index = alumnos.indexOf(solicitudData['usuario']);
+      if (index > -1) {
+        alumnos.splice(index, 1);
+      }
     }
+
+    // Recalcula las plazas libres
+    const plazasLibres = lineaData['plazasOriginal'] - alumnos.length;
 
     // Actualiza el estado de la solicitud
     await updateDoc(solicitudRef, { estado });
 
-    // Actualiza las plazas libres de la línea
-    await updateDoc(lineaRef, { plazasLibres });
+    // Actualiza las plazas libres y el array de alumnos de la línea
+    await updateDoc(lineaRef, { plazasLibres, alumnos });
 
     console.log(`Estado de la solicitud actualizado a: ${estado}`);
   } catch (error) {
@@ -281,7 +303,7 @@ async crearSolicitud(tutorId: string, lineaId: string): Promise<void> {
       throw new Error('Usuario no autenticado');
     }
 
-    const lineaRef = doc(this.db, 'Linea', lineaId);
+    const lineaRef = doc(this.db, this.pathLineas, lineaId);
     const lineaSnapshot = await getDoc(lineaRef);
 
     if (!lineaSnapshot.exists()) {
@@ -293,11 +315,11 @@ async crearSolicitud(tutorId: string, lineaId: string): Promise<void> {
       throw new Error('No hay plazas disponibles para esta línea');
     }
 
-    const solicitudesRef = collection(this.db, 'Solicitud');
+    const solicitudesRef = collection(this.db, this.pathSolicitudes);
     const usuarioQuery = query(
       solicitudesRef,
       where('usuario', '==', userEmail),
-      where('estado', 'in', ['Pendiente', 'Aceptada'])
+      where('estado', 'in', ['Pendiente', 'Aceptada por tutor'])
     );
     const snapshot = await getDocs(usuarioQuery);
 
@@ -324,7 +346,7 @@ async crearSolicitud(tutorId: string, lineaId: string): Promise<void> {
 
 async borrarLinea(lineaId: string): Promise<void> {
   try {
-    const lineaRef = doc(this.db, 'Linea', lineaId);
+    const lineaRef = doc(this.db, this.pathLineas, lineaId);
     await deleteDoc(lineaRef);
     console.log('Línea borrada con éxito');
   } catch (error) {
@@ -334,7 +356,7 @@ async borrarLinea(lineaId: string): Promise<void> {
 }
 async cancelarSolicitud(solicitudId: string): Promise<void> {
   try {
-    const solicitudRef = doc(this.db, 'Solicitud', solicitudId);
+    const solicitudRef = doc(this.db, this.pathSolicitudes, solicitudId);
     await deleteDoc(solicitudRef);
     console.log('Solicitud cancelada con éxito');
   } catch (error) {

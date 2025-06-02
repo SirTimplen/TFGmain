@@ -36,11 +36,11 @@ export class SolicitudesTutorPage implements OnInit {
 
   async aceptarSolicitud(solicitud: any) {
     await this.globalService.actualizarEstadoSolicitud(solicitud.id, 'Aceptada');
-    solicitud.estado = 'Aceptada';
+    solicitud.estado = 'Aceptada pot tutor';
   }
 
   async rechazarSolicitud(solicitud: any) {
-    await this.globalService.actualizarEstadoSolicitud(solicitud.id, 'Rechazada');
-    solicitud.estado = 'Rechazada';
+    await this.globalService.actualizarEstadoSolicitud(solicitud.id, 'Rechazada por tutor');
+    solicitud.estado = 'Rechazada por tutor';
   }
 }
