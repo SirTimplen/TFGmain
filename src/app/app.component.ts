@@ -44,14 +44,17 @@ export class AppComponent implements OnInit{
   usuario: [
     { title: 'Lineas de TFG', url: '/pages/usuario', icon: 'mail' },
     { title: 'Mis Solicitudes', url: '/pages/solicitudes', icon: 'list' },
+    { title: 'Asignaciones', url: '/pages/asignaciones', icon: 'list' },
   ],
   tutor: [
     { title: 'Mis Líneas de TFG', url: '/tutor', icon: 'mail' }, // Asegúrate de que la URL sea correcta
     { title: 'Solicitudes', url: '/pages/solicitudesTutor', icon: 'paper-plane' },
+    { title: 'Asignaciones', url: '/pages/asignaciones', icon: 'list' },
   ],
   tribunal: [
-    { title: 'Lineas de TFG', url: '/pages/lineas', icon: 'mail' },
-    { title: 'Asignaciones', url: '/pages/outbox', icon: 'paper-plane' },
+    { title: 'Mis Líneas de TFG', url: '/tutor', icon: 'mail' }, // Asegúrate de que la URL sea correcta
+    { title: 'Solicitudes', url: '/pages/solicitudesTutor', icon: 'paper-plane' },
+    { title: 'Asignaciones', url: '/pages/asignaciones', icon: 'list' },
   ],
   admin: [
       { title: 'Administrar Líneas', url: '/admin', icon: 'settings' },

@@ -78,8 +78,9 @@ async login(email: string, password: string): Promise<'usuario' | 'tutor' | 'tri
         titulo: data['titulo'] || 'Sin título',
         ambito: data['ambito'] || 'Sin ámbito',
         descripcion: data['descripcion'] || 'Sin descripción',
-        plazasLibres: data['plazasLibres'] || 0,
         plazasOriginal: data['plazasOriginal'] || 0,
+        alumnos: data['alumnos'] || [],
+        plazasLibres: data['plazasOriginal'] - (data['alumnos'] || []).length,
         tutor: data['tutor'] || 'Sin tutor',
       };
     });
@@ -147,11 +148,9 @@ async crearLinea(linea: any, tutorEmail: string): Promise<void> {
     // Asegura que los campos sean number
     const plazasOriginal = Number(linea.plazasOriginal);
     const alumnos: string[] = [];
-    const plazasLibres = plazasOriginal - alumnos.length;
     await addDoc(lineasRef, {
       ...linea,
       tutor: tutorEmail,
-      plazasLibres,
       plazasOriginal,
       alumnos
     });
@@ -161,12 +160,25 @@ async crearLinea(linea: any, tutorEmail: string): Promise<void> {
     throw error;
   }
 }
-async obtenerLineasPorTutor(tutorId: string): Promise<any[]> {
+async obtenerLineasPorTutor(tutorEmail: string): Promise<any[]> {
   try {
     const lineasRef = collection(this.db, this.pathLineas);
-    const tutorQuery = query(lineasRef, where('tutor', '==', tutorId)); // Filtra por la ID del tutor
+    const tutorQuery = query(lineasRef, where('tutor', '==', tutorEmail));
     const snapshot = await getDocs(tutorQuery);
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })); // Incluye el ID del documento
+
+    return snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        titulo: data['titulo'] || 'Sin título',
+        ambito: data['ambito'] || 'Sin ámbito',
+        descripcion: data['descripcion'] || 'Sin descripción',
+        plazasOriginal: data['plazasOriginal'] || 0,
+        alumnos: data['alumnos'] || [],
+        plazasLibres: data['plazasOriginal'] - (data['alumnos'] || []).length,
+        tutor: data['tutor'] || 'Sin tutor',
+      };
+    });
   } catch (error) {
     console.error('Error al obtener las líneas del tutor:', error);
     throw error;
@@ -404,23 +416,18 @@ async cancelarSolicitud(solicitudId: string): Promise<void> {
         snapshot.docs.map(async (docSnapshot) => {
           const data = docSnapshot.data();
 
-          // Obtén el título de la línea usando la ID de la línea
+          // Obtener el título de la línea usando el ID de la línea
           const lineaDoc = await getDoc(doc(this.db, this.pathLineas, data['linea']));
           const lineaTitulo = lineaDoc.exists() ? lineaDoc.data()?.['titulo'] || 'Sin título' : 'Sin título';
 
-          // Obtén el correo del tutor directamente del campo 'tutor' en la solicitud
-          const tutorCorreo = data['tutor'] || 'Sin correo';
-
-          // Obtén el correo del usuario directamente del campo 'usuario' en la solicitud
-          const usuarioCorreo = data['usuario'] || 'Sin correo';
-
           return {
             id: docSnapshot.id,
-            linea: lineaTitulo, // Muestra el título de la línea
-            tutor: tutorCorreo, // Muestra el correo del tutor
-            usuario: usuarioCorreo, // Muestra el correo del usuario
+            tutor: data['tutor'],
+            usuario: data['usuario'],
+            linea: lineaTitulo,
             fecha: data['fecha'],
             estado: data['estado'],
+            asignacion: data['asignacion'] || false,
           };
         })
       );

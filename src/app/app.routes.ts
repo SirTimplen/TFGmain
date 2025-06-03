@@ -5,6 +5,7 @@ import { TutorPage } from './pages/tutor/tutor.page';
 import { TribunalPage } from './pages/tribunal/tribunal.page';
 import { SolicitudesPage } from './pages/solicitudes/solicitudes.page';
 import { SolicitudesTutorPage } from './pages/solicitudesTutor/solicitudesTutor.page';
+import { AsignacionesPage } from './pages/asignaciones/asignaciones.page';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -17,6 +18,7 @@ export const routes: Routes = [
   { path: 'tribunal', component: TribunalPage },
   { path: 'pages/solicitudes', component: SolicitudesPage },
   { path: 'pages/solicitudesTutor', component: SolicitudesTutorPage },
+  { path: 'pages/asignaciones', component: AsignacionesPage }, // Añade esta línea
   {
     path: 'admin',
     loadComponent: () => import('./pages/admin/admin.page').then( m => m.AdminPage)

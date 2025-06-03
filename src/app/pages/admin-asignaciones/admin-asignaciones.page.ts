@@ -31,32 +31,68 @@ export class AdminAsignacionesPage implements OnInit {
   constructor(private globalService: GlobalService) { }
 
   async ngOnInit() {
-    await this.cargarSolicitudesAceptadas();
-  }
-
-  async cargarSolicitudesAceptadas() {
-    // Load the accepted requests from the service
-    this.solicitudesAceptadas = await this.globalService.obtenerSolicitudesAceptadas();
+    try {
+      this.solicitudesAceptadas = await this.globalService.obtenerSolicitudesAceptadas();
+    } catch (error) {
+      console.error('Error al cargar las solicitudes aceptadas:', error);
+    }
   }
 
   async asignarSolicitud(solicitud: any) {
-    solicitud.asignacion = true;
-    await this.globalService.actualizarSolicitud(solicitud.id, solicitud);
-    await this.cargarSolicitudesAceptadas();
+    try {
+      // Logic to assign the request definitively
+      solicitud.asignacion = true;
+      await this.globalService.actualizarSolicitud(solicitud.id, { asignacion: true });
+      console.log('Solicitud asignada definitivamente');
+    } catch (error) {
+      console.error('Error al asignar la solicitud:', error);
+    }
+  }
+
+  async desasignarSolicitud(solicitud: any) {
+    try {
+      // Logic to unassign the request
+      solicitud.asignacion = false;
+      await this.globalService.actualizarSolicitud(solicitud.id, { asignacion: false });
+      console.log('Solicitud desasignada');
+    } catch (error) {
+      console.error('Error al desasignar la solicitud:', error);
+    }
   }
 
   async cancelarSolicitud(solicitud: any) {
-    // Logic to cancel the request
-    await this.globalService.cancelarSolicitud(solicitud.id);
-    await this.cargarSolicitudesAceptadas();
+    try {
+      await this.globalService.cancelarSolicitud(solicitud.id);
+      this.solicitudesAceptadas = this.solicitudesAceptadas.filter(s => s.id !== solicitud.id);
+      console.log('Solicitud cancelada');
+    } catch (error) {
+      console.error('Error al cancelar la solicitud:', error);
+    }
   }
 
   async asignarTodas() {
-    for (const solicitud of this.solicitudesAceptadas) {
-      solicitud.asignacion = true;
-      await this.globalService.actualizarSolicitud(solicitud.id, solicitud);
+    try {
+      for (const solicitud of this.solicitudesAceptadas) {
+        if (!solicitud.asignacion) {
+          await this.asignarSolicitud(solicitud);
+        }
+      }
+      console.log('Todas las solicitudes asignadas');
+    } catch (error) {
+      console.error('Error al asignar todas las solicitudes:', error);
     }
-    await this.cargarSolicitudesAceptadas();
   }
 
+  async desasignarTodas() {
+    try {
+      for (const solicitud of this.solicitudesAceptadas) {
+        if (solicitud.asignacion) {
+          await this.desasignarSolicitud(solicitud);
+        }
+      }
+      console.log('Todas las solicitudes desasignadas');
+    } catch (error) {
+      console.error('Error al desasignar todas las solicitudes:', error);
+    }
+  }
 }

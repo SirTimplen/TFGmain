@@ -1,20 +1,45 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton } from '@ionic/angular/standalone';
+import { GlobalService } from '../../services/global.service';
 
 @Component({
   selector: 'app-asignaciones',
   templateUrl: './asignaciones.page.html',
   styleUrls: ['./asignaciones.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonHeader,
+    IonToolbar,
+    IonButtons,
+    IonMenuButton,
+    IonTitle,
+    IonContent,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
+    IonButton,
+  ],
 })
 export class AsignacionesPage implements OnInit {
+  asignaciones: any[] = [];
 
-  constructor() { }
+  constructor(private globalService: GlobalService) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    await this.cargarAsignaciones();
   }
 
+  async cargarAsignaciones() {
+    try {
+      const solicitudes = await this.globalService.obtenerSolicitudesAceptadas();
+      this.asignaciones = solicitudes.filter(solicitud => solicitud.asignacion);
+    } catch (error) {
+      console.error('Error al cargar las asignaciones:', error);
+    }
+  }
 }
