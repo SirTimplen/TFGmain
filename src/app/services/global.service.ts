@@ -357,11 +357,90 @@ async borrarLinea(lineaId: string): Promise<void> {
 async cancelarSolicitud(solicitudId: string): Promise<void> {
   try {
     const solicitudRef = doc(this.db, this.pathSolicitudes, solicitudId);
+    const solicitudSnapshot = await getDoc(solicitudRef);
+
+    if (!solicitudSnapshot.exists()) {
+      throw new Error('Solicitud no encontrada');
+    }
+
+    const solicitudData = solicitudSnapshot.data();
+    const lineaRef = doc(this.db, this.pathLineas, solicitudData['linea']);
+    const lineaSnapshot = await getDoc(lineaRef);
+
+    if (!lineaSnapshot.exists()) {
+      throw new Error('Línea no encontrada');
+    }
+
+    const lineaData = lineaSnapshot.data();
+    const alumnos = lineaData['alumnos'] || [];
+
+    // Remove the user from the list of students if they exist
+    const index = alumnos.indexOf(solicitudData['usuario']);
+    if (index > -1) {
+      alumnos.splice(index, 1);
+    }
+
+    // Increment the available slots
+    const plazasLibres = lineaData['plazasOriginal'] - alumnos.length;
+
+    // Update the line with the new list of students and available slots
+    await updateDoc(lineaRef, { plazasLibres, alumnos });
+
+    // Delete the request
     await deleteDoc(solicitudRef);
-    console.log('Solicitud cancelada con éxito');
+    console.log('Solicitud cancelada y línea actualizada con éxito');
   } catch (error) {
     console.error('Error al cancelar la solicitud:', error);
     throw error;
   }
 }
+ async obtenerSolicitudesAceptadas(): Promise<any[]> {
+    try {
+      const solicitudesRef = collection(this.db, this.pathSolicitudes);
+      const acceptedQuery = query(solicitudesRef, where('estado', '==', 'Aceptada'));
+      const snapshot = await getDocs(acceptedQuery);
+
+      const solicitudes = await Promise.all(
+        snapshot.docs.map(async (docSnapshot) => {
+          const data = docSnapshot.data();
+
+          // Obtén el título de la línea usando la ID de la línea
+          const lineaDoc = await getDoc(doc(this.db, this.pathLineas, data['linea']));
+          const lineaTitulo = lineaDoc.exists() ? lineaDoc.data()?.['titulo'] || 'Sin título' : 'Sin título';
+
+          // Obtén el correo del tutor directamente del campo 'tutor' en la solicitud
+          const tutorCorreo = data['tutor'] || 'Sin correo';
+
+          // Obtén el correo del usuario directamente del campo 'usuario' en la solicitud
+          const usuarioCorreo = data['usuario'] || 'Sin correo';
+
+          return {
+            id: docSnapshot.id,
+            linea: lineaTitulo, // Muestra el título de la línea
+            tutor: tutorCorreo, // Muestra el correo del tutor
+            usuario: usuarioCorreo, // Muestra el correo del usuario
+            fecha: data['fecha'],
+            estado: data['estado'],
+          };
+        })
+      );
+
+      return solicitudes;
+    } catch (error) {
+      console.error('Error al obtener las solicitudes aceptadas:', error);
+      throw error;
+    }
+  }
+
+  async actualizarSolicitud(solicitudId: string, solicitud: any): Promise<void> {
+    try {
+      const solicitudRef = doc(this.db, this.pathSolicitudes, solicitudId);
+      await updateDoc(solicitudRef, solicitud);
+      console.log('Solicitud actualizada con éxito');
+    } catch (error) {
+      console.error('Error al actualizar la solicitud:', error);
+      throw error;
+    }
+  }
+
 }

@@ -55,6 +55,7 @@ export class AppComponent implements OnInit{
   ],
   admin: [
       { title: 'Administrar Líneas', url: '/admin', icon: 'settings' },
+      {title: 'Asignaciones', url: '/admin-asignaciones', icon: 'list' },
       // Puedes añadir más opciones si lo deseas
     ],
 };

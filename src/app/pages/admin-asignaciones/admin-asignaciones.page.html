@@ -1,6 +1,9 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>adminAsignaciones</ion-title>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button> 
+    </ion-buttons>
+    <ion-title>Administrador de lineas</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -10,4 +13,33 @@
       <ion-title size="large">adminAsignaciones</ion-title>
     </ion-toolbar>
   </ion-header>
+
+  <div class="solicitudes-container">
+    <ion-card *ngFor="let solicitud of solicitudesAceptadas">
+      <ion-card-header>
+        <ion-card-title>{{ solicitud.linea }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p><strong>Alumno:</strong> {{ solicitud.usuario }}</p>
+        <p><strong>Tutor:</strong> {{ solicitud.tutor }}</p>
+        <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 8px;">
+          <ion-button color="success" expand="block" (click)="asignarSolicitud(solicitud)" [disabled]="solicitud.asignacion">
+            Asignar Definitivamente
+          </ion-button>
+          <ion-button color="danger" expand="block" (click)="cancelarSolicitud(solicitud)">
+            Cancelar
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    <ion-card *ngIf="solicitudesAceptadas.length === 0">
+      <ion-card-content style="text-align:center;">
+        No hay solicitudes aceptadas.
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <ion-button color="primary" expand="block" (click)="asignarTodas()">
+    Asignar Todas
+  </ion-button>
 </ion-content>
