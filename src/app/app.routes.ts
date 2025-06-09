@@ -31,4 +31,8 @@ export const routes: Routes = [
     path: 'asignaciones',
     loadComponent: () => import('./pages/asignaciones/asignaciones.page').then( m => m.AsignacionesPage)
   },
+  {
+    path: 'tribunal-admin',
+    loadComponent: () => import('./pages/tribunal-admin/tribunal-admin.page').then( m => m.TribunalAdminPage)
+  },
 ];

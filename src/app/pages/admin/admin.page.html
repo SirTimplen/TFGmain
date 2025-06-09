@@ -32,10 +32,6 @@
     <textarea id="descripcion" placeholder="Descripción" [(ngModel)]="nuevaLinea.descripcion" name="descripcion" required></textarea>
   </div>
   <div class="form-group">
-    <label for="plazasLibres">Plazas Libres:</label>
-    <input id="plazasLibres" type="number" placeholder="Plazas Libres" [(ngModel)]="nuevaLinea.plazasLibres" name="plazasLibres" required>
-  </div>
-  <div class="form-group">
     <label for="plazasOriginal">Plazas Original:</label>
     <input id="plazasOriginal" type="number" placeholder="Plazas Original" [(ngModel)]="nuevaLinea.plazasOriginal" name="plazasOriginal" required>
   </div>
@@ -54,7 +50,6 @@
     <h2>{{ linea.titulo }}</h2>
     <p><strong>Ámbito:</strong> {{ linea.ambito }}</p>
     <p><strong>Descripción:</strong> {{ linea.descripcion }}</p>
-    <p><strong>Plazas libres:</strong> {{ linea.plazasLibres }}</p>
     <p><strong>Plazas original:</strong> {{ linea.plazasOriginal }}</p>
     <p><strong>Tutor:</strong> {{ linea.tutor }}</p>
     <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 8px;">
