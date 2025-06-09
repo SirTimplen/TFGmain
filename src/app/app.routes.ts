@@ -6,33 +6,75 @@ import { TribunalPage } from './pages/tribunal/tribunal.page';
 import { SolicitudesPage } from './pages/solicitudes/solicitudes.page';
 import { SolicitudesTutorPage } from './pages/solicitudesTutor/solicitudesTutor.page';
 import { AsignacionesPage } from './pages/asignaciones/asignaciones.page';
+import { AuthGuard } from './guards/auth.guard';
+import { LoggedInGuard } from './guards/logged-in.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: 'login', component: LoginPage },
-  { path: 'usuario', component: UsuarioPage },
+  {
+    path: 'login',
+    loadComponent: () => import('./pages/login/login.page').then(m => m.LoginPage),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'usuario',
+    loadComponent: () => import('./pages/usuario/usuario.page').then(m => m.UsuarioPage),
+    canActivate: [LoggedInGuard]
+  },
   { path: 'pages/usuario', component: UsuarioPage },
-  { path: 'pages/tutor', component: TutorPage },
-  { path: 'pages/tribunal', component: TribunalPage },
-  { path: 'tutor', component: TutorPage },
-  { path: 'tribunal', component: TribunalPage },
-  { path: 'pages/solicitudes', component: SolicitudesPage },
-  { path: 'pages/solicitudesTutor', component: SolicitudesTutorPage },
+  {
+    path: 'pages/tutor',
+    loadComponent: () => import('./pages/tutor/tutor.page').then(m => m.TutorPage),
+    canActivate: [LoggedInGuard]
+  },
+  {
+    path: 'pages/tribunal',
+    loadComponent: () => import('./pages/tribunal/tribunal.page').then(m => m.TribunalPage),
+    canActivate: [LoggedInGuard]
+  },
+  {
+    path: 'tutor',
+    loadComponent: () => import('./pages/tutor/tutor.page').then(m => m.TutorPage),
+    canActivate: [LoggedInGuard]
+  },
+  {
+    path: 'tribunal',
+    loadComponent: () => import('./pages/tribunal/tribunal.page').then(m => m.TribunalPage),
+    canActivate: [LoggedInGuard]
+  },
+  {
+    path: 'pages/solicitudes',
+    loadComponent: () => import('./pages/solicitudes/solicitudes.page').then(m => m.SolicitudesPage),
+    canActivate: [LoggedInGuard]
+  },
+  {
+    path: 'pages/solicitudesTutor',
+    loadComponent: () => import('./pages/solicitudesTutor/solicitudesTutor.page').then(m => m.SolicitudesTutorPage),
+    canActivate: [LoggedInGuard]
+  },
   { path: 'pages/asignaciones', component: AsignacionesPage }, // Añade esta línea
   {
     path: 'admin',
-    loadComponent: () => import('./pages/admin/admin.page').then( m => m.AdminPage)
+    loadComponent: () => import('./pages/admin/admin.page').then( m => m.AdminPage),
+    canActivate: [LoggedInGuard]
   },
   {
     path: 'admin-asignaciones',
-    loadComponent: () => import('./pages/admin-asignaciones/admin-asignaciones.page').then( m => m.AdminAsignacionesPage)
+    loadComponent: () => import('./pages/admin-asignaciones/admin-asignaciones.page').then( m => m.AdminAsignacionesPage),
+    canActivate: [LoggedInGuard]
   },
   {
     path: 'asignaciones',
-    loadComponent: () => import('./pages/asignaciones/asignaciones.page').then( m => m.AsignacionesPage)
+    loadComponent: () => import('./pages/asignaciones/asignaciones.page').then( m => m.AsignacionesPage),
+    canActivate: [LoggedInGuard]
   },
   {
     path: 'tribunal-admin',
-    loadComponent: () => import('./pages/tribunal-admin/tribunal-admin.page').then( m => m.TribunalAdminPage)
+    loadComponent: () => import('./pages/tribunal-admin/tribunal-admin.page').then( m => m.TribunalAdminPage),
+    canActivate: [LoggedInGuard]
   },
+  {
+    path: '**',
+    redirectTo: 'login'
+  }
 ];

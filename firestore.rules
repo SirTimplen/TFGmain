@@ -7,6 +7,9 @@ service cloud.firestore {
     match /Tutor/{document=**} {
       allow read, write: if true; // Cambiar para producción
     }
+    match /admin/{document=**} {
+      allow read, write: if true; // Permitir lectura y escritura a administradores
+    }
     match /ingenieria_informatica/{document=**}{
       allow read, write: if true; // Cambiar para producción
     }
@@ -22,7 +25,6 @@ service cloud.firestore {
     match /ingenieria_informatica/grado2024-2025/convocatorias/convocatoria_junio/tribunales/{document=**}  {
       allow read, write: if true; // Cambiar para producción
     }
-  
     match /Linea/{document=**}{
       allow read, write: if true; // Cambiar para producción
     }
@@ -31,9 +33,6 @@ service cloud.firestore {
     }
     match /Solicitud/{document=**} {
       allow read,write: if true; // Permitir lectura a todos (solo para pruebas)
-    }
-    match /Tribunal/{document=**} {
-      allow read: if true; // Cambiar para producción
     }
   }
 }

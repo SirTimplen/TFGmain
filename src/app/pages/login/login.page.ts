@@ -20,6 +20,7 @@ export class LoginPage {
   public password: string = '';
 
   constructor(private router: Router, private globalService: GlobalService) {}
+  
 
   ionViewDidEnter() {
   setTimeout(() => {
@@ -41,27 +42,13 @@ export class LoginPage {
   }
 
   async onLogin(event: Event) {
-  event.preventDefault();
+    event.preventDefault(); // Previene el comportamiento por defecto del formulario
 
-  // Verifica si las credenciales son del administrador
-  if (this.email === 'administrador@gmail.com' && this.password === 'administrador') {
-  this.globalService.setUserType('admin'); // <-- Añade esto
-  this.router.navigate(['/admin']);
-  return;
-}
-
-  try {
-    const userType = await this.globalService.login(this.email, this.password);
-
-    if (userType === 'usuario') {
-      this.router.navigate(['/usuario']);
-    } else if (userType === 'tutor') {
-      this.router.navigate(['/tutor']);
-    } else if (userType === 'tribunal') {
-      this.router.navigate(['/tribunal']);
+    try {
+      const userType = await this.globalService.login(this.email, this.password);
+      this.router.navigate(['/' + userType]);
+    } catch (error) {
+      console.error('Error al iniciar sesión:', error);
     }
-  } catch (error) {
-    alert('Error al iniciar sesión: ');
   }
-}
 }

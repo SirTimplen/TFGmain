@@ -1,7 +1,7 @@
-import { Component,OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common'; // Importa CommonModule
-import { IonApp, IonToolbar, IonButtons, IonMenuButton, IonHeader, IonMenu, IonContent, IonTitle, IonList, IonListHeader, IonMenuToggle, IonItem, IonIcon, IonLabel, IonRouterOutlet, IonRouterLink } from '@ionic/angular/standalone';
+import { IonApp, IonToolbar, IonButtons,IonNote, IonMenuButton, IonHeader, IonMenu, IonContent, IonTitle, IonList, IonListHeader, IonMenuToggle, IonItem, IonIcon, IonLabel, IonRouterOutlet, IonRouterLink } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, heartOutline, heartSharp, warningOutline, warningSharp } from 'ionicons/icons';
 import { GlobalService } from './services/global.service';
@@ -20,6 +20,7 @@ interface MenuPage {
     RouterLink,
     RouterLinkActive,
     IonApp,
+    IonNote,
     IonHeader,
     IonButtons,
     IonToolbar,
@@ -63,17 +64,40 @@ export class AppComponent implements OnInit{
       // Puedes añadir más opciones si lo deseas
     ],
 };
-constructor(public globalService: GlobalService, private router: Router) {}
 
+constructor(public globalService: GlobalService, private router: Router) {this.globalService.userType$.subscribe(userType => {
+    if (userType) {
+      this.userType = userType;
+    } else {
+      this.userType = null;
+    }
+  });}
+  
   ngOnInit() {
-    this.globalService.userType$.subscribe((type) => {
-      this.userType = type;
-      console.log('UserType updated in AppComponent:', this.userType); // Depuración
-    });
+    const userType = localStorage.getItem('userType') as 'usuario' | 'tutor' | 'admin' | null;
+    if (userType) {
+      this.userType = userType;
+      this.globalService.setUserType(userType);
+      if(userType === 'admin') {
+        this.router.navigate(['/admin']);
+      }
+      else if(userType === 'tutor') {
+        this.router.navigate(['/pages/tutor']);
+      }
+      else if(userType === 'usuario') {
+        this.router.navigate(['/usuario']);
+      }
+    }
+  }
+
+  logout() {
+    this.globalService.logout();
+    this.userType = null;
+    this.router.navigate(['/login']);
   }
 
   // Método para obtener las páginas del menú según el tipo de usuario
   get appPages(): MenuPage[] {
-    return this.userType ? this.menus[this.userType] : [];
-  }
+  return this.userType && this.menus[this.userType] ? this.menus[this.userType] : [];
+}
 }

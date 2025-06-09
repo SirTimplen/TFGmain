@@ -1,21 +1,26 @@
 <ion-app>
   <ion-menu contentId="main-content" type="overlay">
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Menú</ion-title>
-      </ion-toolbar>
-    </ion-header>
     <ion-content>
-      <ion-list id="menu-list">
-        <ion-menu-toggle auto-hide="false" *ngFor="let page of appPages">
-        <ion-item [routerLink]="page.url" routerDirection="root">
-          <ion-icon [name]="page.icon" slot="start"></ion-icon>
-          <ion-label>{{ page.title }}</ion-label>
-        </ion-item>
-      </ion-menu-toggle>
+      <ion-list id="inbox-list">
+        <ion-list-header>Menú</ion-list-header>
+        <ion-note>Bienvenido, {{userType}}</ion-note>
+
+        <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages; let i = index">
+          <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected">
+            <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-sharp'"></ion-icon>
+            <ion-label>{{ p.title }}</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+        
+        <!-- Añadir el botón de cerrar sesión -->
+        <ion-menu-toggle auto-hide="false">
+          <ion-item button (click)="logout()" lines="none">
+            <ion-icon aria-hidden="true" slot="start" ios="log-out-outline" md="log-out-sharp"></ion-icon>
+            <ion-label>Cerrar Sesión</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
       </ion-list>
     </ion-content>
   </ion-menu>
-
   <ion-router-outlet id="main-content"></ion-router-outlet>
 </ion-app>
