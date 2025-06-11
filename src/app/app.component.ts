@@ -39,18 +39,20 @@ interface MenuPage {
   ],
 })
 export class AppComponent implements OnInit{
-  public userType: 'usuario' | 'tutor' | 'tribunal' |'admin' | null = null;
+  public userType: 'usuario' | 'tutor' |'admin' | null = null;
   
   public menus: { [key: string]: MenuPage[] } = {
   usuario: [
     { title: 'Lineas de TFG', url: '/pages/usuario', icon: 'mail' },
     { title: 'Mis Solicitudes', url: '/pages/solicitudes', icon: 'list' },
     { title: 'Asignaciones', url: '/pages/asignaciones', icon: 'list' },
+    { title: 'Defensa del TFG', url: '/usuario-tribunal', icon: 'warning' },
   ],
   tutor: [
     { title: 'Mis Líneas de TFG', url: '/tutor', icon: 'mail' }, // Asegúrate de que la URL sea correcta
     { title: 'Solicitudes', url: '/pages/solicitudesTutor', icon: 'paper-plane' },
     { title: 'Asignaciones', url: '/pages/asignaciones', icon: 'list' },
+    { title: 'Tribunales', url: '/pages/tribunal', icon: 'warning' },
   ],
   tribunal: [
     { title: 'Mis Líneas de TFG', url: '/tutor', icon: 'mail' }, // Asegúrate de que la URL sea correcta

@@ -29,31 +29,31 @@
         <ion-item>
           <ion-label position="floating">Profesor 1</ion-label>
           <ion-select [(ngModel)]="nuevoTribunal.profesor1" name="profesor1">
-            <ion-select-option *ngFor="let profesor of profesores" [value]="profesor.nombre">{{profesor.nombre}}</ion-select-option>
+            <ion-select-option *ngFor="let profesor of profesores" [value]="profesor.id">{{profesor.correo}}</ion-select-option>
           </ion-select>
         </ion-item>
         <ion-item>
           <ion-label position="floating">Profesor 2</ion-label>
           <ion-select [(ngModel)]="nuevoTribunal.profesor2" name="profesor2">
-            <ion-select-option *ngFor="let profesor of profesores" [value]="profesor.nombre">{{profesor.nombre}}</ion-select-option>
+            <ion-select-option *ngFor="let profesor of profesores" [value]="profesor.id">{{profesor.correo}}</ion-select-option>
           </ion-select>
         </ion-item>
         <ion-item>
           <ion-label position="floating">Profesor 3</ion-label>
           <ion-select [(ngModel)]="nuevoTribunal.profesor3" name="profesor3">
-            <ion-select-option *ngFor="let profesor of profesores" [value]="profesor.nombre">{{profesor.nombre}}</ion-select-option>
+            <ion-select-option *ngFor="let profesor of profesores" [value]="profesor.id">{{profesor.correo}}</ion-select-option>
           </ion-select>
         </ion-item>
         <ion-item>
           <ion-label position="floating">Profesor Suplente</ion-label>
           <ion-select [(ngModel)]="nuevoTribunal.suplente" name="suplente">
-            <ion-select-option *ngFor="let profesor of profesores" [value]="profesor.nombre">{{profesor.nombre}}</ion-select-option>
+            <ion-select-option *ngFor="let profesor of profesores" [value]="profesor.id">{{profesor.correo}}</ion-select-option>
           </ion-select>
         </ion-item>
         <ion-item>
           <ion-label position="floating">Alumnos</ion-label>
           <ion-select [(ngModel)]="nuevoTribunal.alumnos" name="alumnos" multiple="true">
-            <ion-select-option *ngFor="let alumno of alumnos" [value]="alumno.nombre">{{alumno.nombre}}</ion-select-option>
+            <ion-select-option *ngFor="let alumno of alumnos" [value]="alumno.id">{{alumno.correo}}</ion-select-option>
           </ion-select>
         </ion-item>
         <ion-button expand="block" type="submit">Crear Tribunal</ion-button>

@@ -187,7 +187,18 @@ export class GlobalService {
       throw error;
     }
   }
-
+ async getUserId(): Promise<string | null> {
+  const userEmail = await this.getUserEmail();
+  if (!userEmail) {
+    return null;
+  }
+  const userRef = query(collection(this.db, 'Usuario'), where('Correo', '==', userEmail));
+  const userSnapshot = await getDocs(userRef);
+  if (!userSnapshot.empty) {
+    return userSnapshot.docs[0].id;
+  }
+  return null;
+ }
   async actualizarLinea(lineaId: string, linea: any): Promise<void> {
     try {
       const lineaRef = doc(this.db, this.pathLineas, lineaId);
@@ -496,7 +507,7 @@ export class GlobalService {
     try {
       const profesoresRef = collection(this.db, 'Tutor');
       const snapshot = await getDocs(profesoresRef);
-      return snapshot.docs.map(doc => ({ id: doc.id, nombre: doc.data()['Nombre'] }));
+      return snapshot.docs.map(doc => ({ id: doc.id, correo: doc.data()['Correo'] }));
     } catch (error) {
       console.error('Error al obtener los profesores:', error);
       throw error;

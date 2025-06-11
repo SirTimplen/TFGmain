@@ -74,7 +74,14 @@ export const routes: Routes = [
     canActivate: [LoggedInGuard]
   },
   {
+    path: 'usuario-tribunal',
+    loadComponent: () => import('./pages/usuario-tribunal/usuario-tribunal.page').then( m => m.UsuarioTribunalPage)
+    ,
+    canActivate: [LoggedInGuard]
+  },
+  {
     path: '**',
     redirectTo: 'login'
   }
+  
 ];

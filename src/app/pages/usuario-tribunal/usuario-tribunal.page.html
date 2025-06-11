@@ -1,0 +1,39 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Mi Tribunal</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Mi Tribunal</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-card *ngIf="tribunal">
+    <ion-card-header>
+      <ion-card-title>Información del Tribunal</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p><strong>Fecha:</strong> {{ tribunal.fecha | date:'dd/MM/yyyy HH:mm' }}</p>
+      <p><strong>Lugar:</strong> {{ tribunal.lugar }}</p>
+      <p><strong>Profesor 1:</strong> {{ tribunal.profesor1 }}</p>
+      <p><strong>Profesor 2:</strong> {{ tribunal.profesor2 }}</p>
+      <p><strong>Profesor 3:</strong> {{ tribunal.profesor3 }}</p>
+      <p><strong>Suplente:</strong> {{ tribunal.suplente }}</p>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card *ngIf="!tribunal">
+    <ion-card-header>
+      <ion-card-title>Sin Tribunal Asignado</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>Aún no has sido asignado a ningún tribunal.</p>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
