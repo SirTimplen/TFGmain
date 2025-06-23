@@ -43,7 +43,7 @@ export class UsuarioTribunalPage implements OnInit {
       }
 
       const tribunales = await this.globalService.obtenerTribunales();
-      this.tribunal = tribunales.find(t => t.alumnos.includes(userId));
+      this.tribunal = tribunales.find(t => t.alumnosID.includes(userId));
 
       if (!this.tribunal) {
         console.log('El usuario no está asignado a ningún tribunal');

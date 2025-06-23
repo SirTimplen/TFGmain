@@ -42,9 +42,6 @@
   <button class="custom-btn" type="submit" style="width: 100%; margin-top: 12px;">Crear Línea</button>
 </form>
 
-<div style=" margin: 16px 0;">
-  <button class="custom-btn warning" (click)="resetPlazasTodas()">Resetear plazas de todas</button>
-</div>
 <div class="lineas-container">
   <div class="linea-card" *ngFor="let linea of lineas">
     <h2>{{ linea.titulo }}</h2>
@@ -55,7 +52,6 @@
     <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 8px;">
       <button class="custom-btn primary" (click)="editarLinea(linea)">Editar</button>
       <button class="custom-btn danger" (click)="borrarLinea(linea)">Borrar</button>
-      <button class="custom-btn" (click)="resetPlazas(linea)">Resetear plazas</button>
     </div>
   </div>
 </div>

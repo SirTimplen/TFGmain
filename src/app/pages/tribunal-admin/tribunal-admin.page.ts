@@ -12,7 +12,7 @@ import { GlobalService } from '../../services/global.service';
   templateUrl: './tribunal-admin.page.html',
   styleUrls: ['./tribunal-admin.page.scss'],
   standalone: true,
-imports: [
+  imports: [
     CommonModule,
     RouterModule,
     FormsModule, // Add FormsModule here
@@ -37,7 +37,8 @@ imports: [
     IonCardContent,
     IonButton,
     IonSelectOption,
-  ],})
+  ],
+})
 export class TribunalAdminPage implements OnInit {
   nuevoTribunal: any = {
     alumnos: []
@@ -73,6 +74,11 @@ export class TribunalAdminPage implements OnInit {
 
   async crearTribunal() {
     try {
+      // Asegúrate de que la fecha esté en el formato correcto antes de enviarla
+      if (this.nuevoTribunal.fecha) {
+        this.nuevoTribunal.fecha = new Date(this.nuevoTribunal.fecha).toISOString();
+      }
+      
       // Aseguramos que los alumnos seleccionados se incluyan en el nuevo tribunal
       await this.globalService.crearTribunal(this.nuevoTribunal);
       this.nuevoTribunal = { alumnos: [] }; // Reseteamos el formulario, manteniendo la estructura
@@ -87,4 +93,20 @@ export class TribunalAdminPage implements OnInit {
     // Implementar la navegación a una página de detalles del tribunal
     // donde se puedan ver y gestionar las calificaciones y entregas
   }
+
+  onFechaChange(event: any) {
+    // Asegúrate de que la fecha se guarde como una cadena ISO
+    this.nuevoTribunal.fecha = new Date(event.detail.value).toISOString();
+  }
+  getProfesorName(profesorId: string): string {
+  const profesor = this.profesores.find(p => p.id === profesorId);
+  return profesor ? profesor.correo : 'No asignado';
+}
+
+getAlumnoNames(alumnoIds: string[]): string[] {
+  return alumnoIds.map(id => {
+    const alumno = this.alumnos.find(a => a.id === id);
+    return alumno ? alumno.correo : 'No encontrado';
+  });
+}
 }

@@ -464,32 +464,46 @@ export class GlobalService {
     }
   }
 
-  async obtenerTribunales(): Promise<any[]> {
-    try {
-      const tribunalesRef = collection(this.db, this.pathTribunales);
-      const snapshot = await getDocs(tribunalesRef);
+async obtenerTribunales(): Promise<any[]> {
+  try {
+    const tribunalesRef = collection(this.db, this.pathTribunales);
+    const snapshot = await getDocs(tribunalesRef);
 
-      const tribunales = await Promise.all(snapshot.docs.map(async (doc) => {
-        const data = doc.data();
-
-        return {
-          id: doc.id,
-          fecha: data['fecha'],
-          lugar: data['lugar'],
-          profesor1: data['profesor1'],
-          profesor2: data['profesor2'],
-          profesor3: data['profesor3'],
-          suplente: data['suplente'],
-          alumnos: data['alumnos'],
-        };
+    const tribunales = await Promise.all(snapshot.docs.map(async (doc) => {
+      const data = doc.data();
+      const profesor1 = await this.obtenerNombreProfesor(data['profesor1']);
+      const profesor2 = await this.obtenerNombreProfesor(data['profesor2']);
+      const profesor3 = await this.obtenerNombreProfesor(data['profesor3']);
+      const suplente = await this.obtenerNombreProfesor(data['suplente']);
+      
+      // Asegúrate de que data['alumnos'] sea un array, si no lo es, usa un array vacío
+      const alumnosArray = Array.isArray(data['alumnos']) ? data['alumnos'] : [];
+      
+      const alumnos = await Promise.all(alumnosArray.map(async (alumnoId: string) => {
+        const alumnoNombre = await this.obtenerNombreAlumno(alumnoId);
+        return alumnoNombre;
       }));
+      const alumnosID = alumnosArray.map((alumnoId) => alumnoId);
 
-      return tribunales;
-    } catch (error) {
-      console.error('Error al obtener los tribunales:', error);
-      throw error;
-    }
+      return {
+        id: doc.id,
+        fecha: data['fecha'],
+        lugar: data['lugar'],
+        profesor1: profesor1,
+        profesor2: profesor2,
+        profesor3: profesor3,
+        suplente: suplente,
+        alumnos: alumnos,
+        alumnosID: alumnosID,
+      };
+    }));
+
+    return tribunales;
+  } catch (error) {
+    console.error('Error al obtener los tribunales:', error);
+    throw error;
   }
+}
 
   private async obtenerNombreProfesor(profesorId: string): Promise<string> {
     if (!profesorId) return 'No asignado';
