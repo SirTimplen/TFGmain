@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton } from '@ionic/angular/standalone';
+import { IonHeader,IonText,IonItem,IonLabel, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton } from '@ionic/angular/standalone';
 import { GlobalService } from '../../services/global.service';
 
 @Component({
@@ -11,6 +11,9 @@ import { GlobalService } from '../../services/global.service';
   standalone: true,
   imports: [
     CommonModule,
+    IonText,
+    IonItem,
+    IonLabel,
     FormsModule,
     IonHeader,
     IonToolbar,
@@ -27,11 +30,13 @@ import { GlobalService } from '../../services/global.service';
 })
 export class UsuarioTribunalPage implements OnInit {
   tribunal: any = null;
-
+  entrega: any = null;
   constructor(private globalService: GlobalService) { }
 
   async ngOnInit() {
     await this.cargarTribunal();
+    await this.cargarEntrega();
+
   }
 
   async cargarTribunal() {
@@ -52,4 +57,38 @@ export class UsuarioTribunalPage implements OnInit {
       console.error('Error al cargar el tribunal:', error);
     }
   }
+  subiendo: boolean = false;
+mensaje: string = '';
+
+async onFileSelected(event: any) {
+  const archivo: File = event.target.files[0];
+  if (!archivo || !this.tribunal?.id) return;
+  this.subiendo = true;
+  this.mensaje = '';
+  try {
+    await this.globalService.subirEntregaTFG(archivo, this.tribunal.id);
+    this.mensaje = 'Entrega subida correctamente.';
+  } catch (error) {
+    this.mensaje = 'Error al subir la entrega.';
+    console.error(error);
+  }
+  this.subiendo = false;
+}
+async cargarEntrega() {
+  if (!this.tribunal?.id) return;
+  const userEmail = await this.globalService.getUserEmail();
+  if (!userEmail) return;
+  this.entrega = await this.globalService.obtenerEntregaUsuario(this.tribunal.id, userEmail);
+}
+async borrarEntrega() {
+  if (!this.tribunal?.id || !this.entrega) return;
+  try {
+    await this.globalService.borrarEntregaUsuario(this.tribunal.id, this.entrega.id, this.entrega.archivoUrl);
+    this.mensaje = 'Entrega borrada correctamente.';
+    this.entrega = null;
+  } catch (error) {
+    this.mensaje = 'Error al borrar la entrega.';
+    console.error(error);
+  }
+}
 }

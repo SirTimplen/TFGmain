@@ -76,21 +76,12 @@ constructor(public globalService: GlobalService, private router: Router) {this.g
   });}
   
   ngOnInit() {
-    const userType = localStorage.getItem('userType') as 'usuario' | 'tutor' | 'admin' | null;
-    if (userType) {
-      this.userType = userType;
-      this.globalService.setUserType(userType);
-      if(userType === 'admin') {
-        this.router.navigate(['/admin']);
-      }
-      else if(userType === 'tutor') {
-        this.router.navigate(['/pages/tutor']);
-      }
-      else if(userType === 'usuario') {
-        this.router.navigate(['/usuario']);
-      }
-    }
+  const userType = localStorage.getItem('userType') as 'usuario' | 'tutor' | 'admin' | null;
+  if (userType) {
+    this.userType = userType;
+    this.globalService.setUserType(userType);
   }
+}
 
   logout() {
     this.globalService.logout();

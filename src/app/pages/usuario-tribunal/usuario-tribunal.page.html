@@ -25,6 +25,27 @@
       <p><strong>Profesor 2:</strong> {{ tribunal.profesor2 }}</p>
       <p><strong>Profesor 3:</strong> {{ tribunal.profesor3 }}</p>
       <p><strong>Suplente:</strong> {{ tribunal.suplente }}</p>
+      <hr>
+    <form *ngIf="!entrega">
+  <ion-item>
+    <ion-label>Subir entrega TFG</ion-label>
+    <input type="file" (change)="onFileSelected($event)" [disabled]="subiendo" />
+  </ion-item>
+  <ion-text color="success" *ngIf="mensaje">{{mensaje}}</ion-text>
+</form>
+
+<!-- ...existing code... -->
+<div *ngIf="entrega">
+  <ion-item>
+    <ion-label>Archivo entregado:</ion-label>
+    <a [href]="entrega.archivoUrl" download>
+      Descargar archivo
+    </a>
+    <ion-button color="danger" (click)="borrarEntrega()">Borrar entrega</ion-button>
+  </ion-item>
+  <ion-text color="success" *ngIf="mensaje">{{mensaje}}</ion-text>
+</div>
+<!-- ...existing code... -->
     </ion-card-content>
   </ion-card>
 

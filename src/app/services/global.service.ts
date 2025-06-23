@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { getFirestore, doc, getDoc, collection, query, where, getDocs, updateDoc, addDoc, deleteDoc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { setPersistence, browserLocalPersistence } from 'firebase/auth';
+import { deleteObject } from "firebase/storage";
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +17,33 @@ export class GlobalService {
   private userTypeSubject = new BehaviorSubject<'usuario' | 'tutor' | 'admin' | null>(null);
   userType$ = this.userTypeSubject.asObservable();
 
-  constructor() {}
+  constructor() {
+    const auth = getAuth();
+    setPersistence(auth, browserLocalPersistence)
+      .then(() => {
+        // Persistencia configurada correctamente
+        const userType = localStorage.getItem('userType') as 'usuario' | 'tutor' | 'admin' | null;
+        if (userType) {
+          this.userTypeSubject.next(userType);
+        }
+        const email = localStorage.getItem('email');
+        const password = localStorage.getItem('password');
+
+        if (email && password) {
+          // Si hay un email guardado, significa que el usuario ya ha iniciado sesión
+          signInWithEmailAndPassword(auth, email,password || '')
+            .then(() => {
+              console.log('Usuario autenticado automáticamente');
+            })
+            .catch((error) => {
+              console.error('Error al autenticar automáticamente:', error);
+            });
+        }
+      })
+      .catch((error) => {
+        console.error('Error al establecer la persistencia de sesión:', error);
+      });
+  }
 
   async login(email: string, password: string): Promise<'usuario' | 'tutor' | 'admin'> {
     const auth = getAuth();
@@ -46,6 +75,7 @@ export class GlobalService {
       this.setUserType(userType);
       localStorage.setItem('userType', userType);
       localStorage.setItem('email', email);
+      localStorage.setItem('password', password); // Guardar la contraseña (no recomendado en producción)
       return userType;
     } catch (error) {
       console.error('Error en login:', error);
@@ -56,7 +86,9 @@ export class GlobalService {
   setUserType(type: 'usuario' | 'tutor' | 'admin') {
     this.userTypeSubject.next(type);
   }
-
+  getpassword(): string | null {
+    return localStorage.getItem('password');
+  }
   logout() {
     this.userTypeSubject.next(null);
     localStorage.removeItem('userType');
@@ -566,4 +598,58 @@ async obtenerTribunales(): Promise<any[]> {
   async agregarEntrega(tribunalId: string, entrega: any): Promise<void> {
     // Implementar lógica para agregar entrega
   }
+  async subirEntregaTFG(archivo: File, tribunalId: string): Promise<void> {
+  const userEmail = await this.getUserEmail();
+  if (!userEmail) throw new Error('Usuario no autenticado');
+  const storage = getStorage();
+  const db = this.db;
+  const storageRef = ref(storage, `entregas-tfg/${tribunalId}/${userEmail}_${archivo.name}`);
+  const snapshot = await uploadBytes(storageRef, archivo);
+  const url = await getDownloadURL(snapshot.ref);
+
+  // Guarda la entrega en la subcolección "entregas" del tribunal
+  const entregasRef = collection(
+    db,
+    `/ingenieria_informatica/grado2024-2025/convocatorias/convocatoria_junio/tribunales/${tribunalId}/entregas`
+  );
+  await addDoc(entregasRef, {
+    usuario: userEmail,
+    archivoUrl: url,
+    fecha: new Date().toISOString(),
+    calificaciones: {
+      profesor1: null,
+      profesor2: null,
+      profesor3: null,
+      tutor: null
+    }
+  });
+  //recargar la pagina
+  window.location.reload();
+}
+async obtenerEntregaUsuario(tribunalId: string, userEmail: string): Promise<any | null> {
+  const entregasRef = collection(
+    this.db,
+    `/ingenieria_informatica/grado2024-2025/convocatorias/convocatoria_junio/tribunales/${tribunalId}/entregas`
+  );
+  const q = query(entregasRef, where('usuario', '==', userEmail));
+  const snapshot = await getDocs(q);
+  if (!snapshot.empty) {
+    const docSnap = snapshot.docs[0];
+    return { id: docSnap.id, ...docSnap.data() };
+  }
+  return null;
+}
+async borrarEntregaUsuario(tribunalId: string, entregaId: string, archivoUrl: string): Promise<void> {
+  // Borrar archivo de Storage
+  const storage = getStorage();
+  const archivoRef = ref(storage, archivoUrl);
+  await deleteObject(archivoRef);
+
+  // Borrar documento de Firestore
+  const entregaDocRef = doc(
+    this.db,
+    `/ingenieria_informatica/grado2024-2025/convocatorias/convocatoria_junio/tribunales/${tribunalId}/entregas/${entregaId}`
+  );
+  await deleteDoc(entregaDocRef);
+}
 }
