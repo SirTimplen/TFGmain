@@ -34,7 +34,7 @@ service cloud.firestore {
     match /Solicitud/{document=**} {
       allow read,write: if true; // Permitir lectura a todos (solo para pruebas)
     }
-    match /ingenieria_informatica/grado2024-2025/convocatorias/convocatoria_junio/tribunales/{tribunalId}/entregas/{entregaId} {
+    match /ingenieria_informatica/grado2024-2025/convocatorias/convocatoria_junio/tribunales/{tribunalId}/defensas/{entregaId} {
       allow read,write: if request.auth!=null;
     }
   }

@@ -21,9 +21,9 @@
     <ion-card-content>
       <p><strong>Fecha:</strong> {{ tribunal.fecha | date:'dd/MM/yyyy HH:mm' }}</p>
       <p><strong>Lugar:</strong> {{ tribunal.lugar }}</p>
-      <p><strong>Profesor 1:</strong> {{ tribunal.profesor1 }}</p>
-      <p><strong>Profesor 2:</strong> {{ tribunal.profesor2 }}</p>
-      <p><strong>Profesor 3:</strong> {{ tribunal.profesor3 }}</p>
+      <p><strong>Profesor 1:</strong> {{ tribunal.presidente }}</p>
+      <p><strong>Profesor 2:</strong> {{ tribunal.secretario }}</p>
+      <p><strong>Profesor 3:</strong> {{ tribunal.vocal }}</p>
       <p><strong>Suplente:</strong> {{ tribunal.suplente }}</p>
       <hr>
     <form *ngIf="!entrega">

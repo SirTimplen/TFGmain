@@ -82,8 +82,10 @@ async cargarEntrega() {
 }
 async borrarEntrega() {
   if (!this.tribunal?.id || !this.entrega) return;
+  const userEmail = await this.globalService.getUserEmail();
+  if (!userEmail) return;
   try {
-    await this.globalService.borrarEntregaUsuario(this.tribunal.id, this.entrega.id, this.entrega.archivoUrl);
+    await this.globalService.borrarEntregaUsuario(this.tribunal.id, userEmail, this.entrega.archivoUrl);
     this.mensaje = 'Entrega borrada correctamente.';
     this.entrega = null;
   } catch (error) {

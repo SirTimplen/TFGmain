@@ -27,20 +27,20 @@
           <ion-input [(ngModel)]="nuevoTribunal.lugar" name="lugar"></ion-input>
         </ion-item>
         <ion-item>
-          <ion-label position="floating">Profesor 1</ion-label>
-          <ion-select [(ngModel)]="nuevoTribunal.profesor1" name="profesor1">
+          <ion-label position="floating">Presidente/a</ion-label>
+          <ion-select [(ngModel)]="nuevoTribunal.profesor1" name="presidente">
             <ion-select-option *ngFor="let profesor of profesores" [value]="profesor.id">{{profesor.correo}}</ion-select-option>
           </ion-select>
         </ion-item>
         <ion-item>
-          <ion-label position="floating">Profesor 2</ion-label>
-          <ion-select [(ngModel)]="nuevoTribunal.profesor2" name="profesor2">
+          <ion-label position="floating">Secretario/a</ion-label>
+          <ion-select [(ngModel)]="nuevoTribunal.profesor2" name="secretario">
             <ion-select-option *ngFor="let profesor of profesores" [value]="profesor.id">{{profesor.correo}}</ion-select-option>
           </ion-select>
         </ion-item>
         <ion-item>
-          <ion-label position="floating">Profesor 3</ion-label>
-          <ion-select [(ngModel)]="nuevoTribunal.profesor3" name="profesor3">
+          <ion-label position="floating">Vocal</ion-label>
+          <ion-select [(ngModel)]="nuevoTribunal.profesor3" name="vocal">
             <ion-select-option *ngFor="let profesor of profesores" [value]="profesor.id">{{profesor.correo}}</ion-select-option>
           </ion-select>
         </ion-item>
@@ -68,16 +68,56 @@
     <ion-card-content>
       <ion-list>
         <ion-item *ngFor="let tribunal of tribunales">
-          <ion-label>
-            <h2>Fecha: {{tribunal.fecha | date:'dd/MM/yyyy'}}</h2>
-            <p>Lugar: {{tribunal.lugar}}</p>
-            <p>Profesores: {{tribunal.profesor1}}, {{tribunal.profesor2}}, {{tribunal.profesor3}}</p>
-            <p>Suplente: {{tribunal.suplente }}</p>
-            <p>Alumnos: {{tribunal.alumnos?.join(', ') || 'Ninguno asignado'}}</p>
-          </ion-label>
-          <ion-button slot="end" (click)="verDetallesTribunal(tribunal.id)">Ver Detalles</ion-button>
-        </ion-item>
+  <ion-label>
+    <p>Presidente/a: {{ tribunal.presidente }}</p>
+    <p>Secretario/a: {{ tribunal.secretario }}</p>
+    <p>Vocal: {{ tribunal.vocal }}</p>
+    <p>Suplente: {{ tribunal.suplente }}</p>
+  </ion-label>
+  <ion-button (click)="verDefensas(tribunal.id)">
+    {{ tribunalSeleccionadoId === tribunal.id ? 'Ocultar Defensas' : 'Ver Defensas' }}
+  </ion-button>
+  <ion-button color="danger" (click)="borrarTribunal(tribunal.id)">Borrar</ion-button>
+</ion-item>
+
       </ion-list>
     </ion-card-content>
   </ion-card>
+  <ion-card *ngIf="tribunalSeleccionadoId">
+  <ion-card-header>
+    <ion-card-title>Defensas del Tribunal</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <ion-list>
+      <ion-item *ngFor="let defensa of defensas">
+        <ion-label>
+          <p>Alumno: {{ defensa.alumnoNombre }}</p>
+          <p>Fecha: {{ defensa.fecha | date:'dd/MM/yyyy HH:mm' }}</p>
+          <p>Lugar: {{ defensa.lugar }}</p>
+        </ion-label>
+        <ion-button color="danger" (click)="eliminarDefensa(defensa.id)">Eliminar</ion-button>
+      </ion-item>
+    </ion-list>
+    <ion-button expand="block" (click)="toggleFormularioDefensa()">
+      {{ mostrarFormularioDefensa ? 'Ocultar formulario' : 'Añadir Defensa' }}
+    </ion-button>
+    <form *ngIf="mostrarFormularioDefensa" (ngSubmit)="anadirDefensa()">
+      <ion-item>
+        <ion-label>Fecha y hora</ion-label>
+        <ion-datetime [(ngModel)]="nuevaFecha" name="nuevaFecha" required></ion-datetime>
+      </ion-item>
+      <ion-item>
+        <ion-label>Lugar</ion-label>
+        <ion-input [(ngModel)]="nuevoLugar" name="nuevoLugar" required></ion-input>
+      </ion-item>
+      <ion-item>
+  <ion-label>Alumno</ion-label>
+  <ion-select [(ngModel)]="nuevoAlumnoId" name="nuevoAlumnoId" required>
+    <ion-select-option *ngFor="let alumno of alumnos" [value]="alumno.id">{{alumno.correo}}</ion-select-option>
+  </ion-select>
+</ion-item>
+      <ion-button expand="block" type="submit">Añadir Defensa</ion-button>
+    </form>
+  </ion-card-content>
+</ion-card>
 </ion-content>

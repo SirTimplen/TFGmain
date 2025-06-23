@@ -5,6 +5,7 @@ import { getFirestore, doc, getDoc, collection, query, where, getDocs, updateDoc
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { deleteObject } from "firebase/storage";
+import { arrayUnion,deleteField } from 'firebase/firestore'; // Añade esta importación si quieres usar arrays
 
 @Injectable({
   providedIn: 'root',
@@ -503,30 +504,17 @@ async obtenerTribunales(): Promise<any[]> {
 
     const tribunales = await Promise.all(snapshot.docs.map(async (doc) => {
       const data = doc.data();
-      const profesor1 = await this.obtenerNombreProfesor(data['profesor1']);
-      const profesor2 = await this.obtenerNombreProfesor(data['profesor2']);
-      const profesor3 = await this.obtenerNombreProfesor(data['profesor3']);
+      const presidente = await this.obtenerNombreProfesor(data['presidente']);
+      const secretario = await this.obtenerNombreProfesor(data['secretario']);
+      const vocal = await this.obtenerNombreProfesor(data['vocal']);
       const suplente = await this.obtenerNombreProfesor(data['suplente']);
-      
-      // Asegúrate de que data['alumnos'] sea un array, si no lo es, usa un array vacío
-      const alumnosArray = Array.isArray(data['alumnos']) ? data['alumnos'] : [];
-      
-      const alumnos = await Promise.all(alumnosArray.map(async (alumnoId: string) => {
-        const alumnoNombre = await this.obtenerNombreAlumno(alumnoId);
-        return alumnoNombre;
-      }));
-      const alumnosID = alumnosArray.map((alumnoId) => alumnoId);
 
       return {
         id: doc.id,
-        fecha: data['fecha'],
-        lugar: data['lugar'],
-        profesor1: profesor1,
-        profesor2: profesor2,
-        profesor3: profesor3,
+        presidente: presidente,
+        secretario: secretario,
+        vocal: vocal,
         suplente: suplente,
-        alumnos: alumnos,
-        alumnosID: alumnosID,
       };
     }));
 
@@ -559,19 +547,66 @@ async obtenerTribunales(): Promise<any[]> {
       throw error;
     }
   }
+async crearTribunal(tribunal: any): Promise<void> {
+  try {
+    const tribunalesRef = collection(this.db, this.pathTribunales);
 
-  async crearTribunal(tribunal: any): Promise<void> {
-    try {
-      const tribunalesRef = collection(this.db, this.pathTribunales);
-      await addDoc(tribunalesRef, {
-        ...tribunal,
+    // Si hay varios alumnos, crea un tribunal por cada uno, separando la hora 45 minutos
+    
+
+        // Crea el tribunal (sin alumnos)
+        const tribunalDocRef = await addDoc(tribunalesRef, {
+          presidente: tribunal.profesor1,
+          secretario: tribunal.profesor2,
+          vocal: tribunal.profesor3,
+          suplente: tribunal.suplente
+        });
+if (Array.isArray(tribunal.alumnos) && tribunal.alumnos.length > 0) {
+      let baseDate = new Date(tribunal.fecha);
+      for (let i = 0; i < tribunal.alumnos.length; i++) {
+        const alumnoId = tribunal.alumnos[i];
+        const fechaTribunal = new Date(baseDate.getTime() + i * 45 * 60000); // 45 minutos por alumno
+        // Crea la defensa en la subcolección defensas
+        const defensasRef = collection(tribunalDocRef, 'defensas');
+        await addDoc(defensasRef, {
+          alumno: alumnoId,
+          calificaciones: {
+            presidente: null,
+            secretario: null,
+            vocal: null,
+            tutor: null
+          },
+          fecha: fechaTribunal.toISOString(),
+          lugar: tribunal.lugar
+        });
+      }
+    } else {
+      // Solo un alumno
+      const tribunalDocRef = await addDoc(tribunalesRef, {
+        presidente: tribunal.profesor1,
+        secretario: tribunal.profesor2,
+        vocal: tribunal.profesor3,
+        suplente: tribunal.suplente
       });
-      console.log('Tribunal creado con éxito');
-    } catch (error) {
-      console.error('Error al crear el tribunal:', error);
-      throw error;
+      const defensasRef = collection(tribunalDocRef, 'defensas');
+      await addDoc(defensasRef, {
+        alumno: tribunal.alumnos ? tribunal.alumnos[0] : null,
+        calificaciones: {
+          presidente: null,
+          secretario: null,
+          vocal: null,
+          tutor: null
+        },
+        fecha: tribunal.fecha,
+        lugar: tribunal.lugar
+      });
     }
+    console.log('Tribunal(es) y defensa(s) creados con éxito');
+  } catch (error) {
+    console.error('Error al crear el tribunal:', error);
+    throw error;
   }
+}
 
   async obtenerAlumnos(): Promise<any[]> {
     try {
@@ -589,67 +624,62 @@ async obtenerTribunales(): Promise<any[]> {
       throw error;
     }
   }
-
-  // Métodos adicionales para gestionar calificaciones y entregas
-  async agregarCalificacion(tribunalId: string, calificacion: any): Promise<void> {
-    // Implementar lógica para agregar calificación
-  }
-
-  async agregarEntrega(tribunalId: string, entrega: any): Promise<void> {
-    // Implementar lógica para agregar entrega
-  }
-  async subirEntregaTFG(archivo: File, tribunalId: string): Promise<void> {
+async subirEntregaTFG(archivo: File, tribunalId: string): Promise<void> {
   const userEmail = await this.getUserEmail();
   if (!userEmail) throw new Error('Usuario no autenticado');
   const storage = getStorage();
-  const db = this.db;
   const storageRef = ref(storage, `entregas-tfg/${tribunalId}/${userEmail}_${archivo.name}`);
   const snapshot = await uploadBytes(storageRef, archivo);
   const url = await getDownloadURL(snapshot.ref);
 
-  // Guarda la entrega en la subcolección "entregas" del tribunal
-  const entregasRef = collection(
-    db,
-    `/ingenieria_informatica/grado2024-2025/convocatorias/convocatoria_junio/tribunales/${tribunalId}/entregas`
-  );
-  await addDoc(entregasRef, {
-    usuario: userEmail,
+  // Busca la defensa del alumno en la subcolección defensas
+  const defensasRef = collection(this.db, `${this.pathTribunales}/${tribunalId}/defensas`);
+  const q = query(defensasRef, where('alumno', '==', userEmail));
+  const defensasSnap = await getDocs(q);
+  if (defensasSnap.empty) throw new Error('No se encontró la defensa para este alumno');
+
+  const defensaDoc = defensasSnap.docs[0];
+  await updateDoc(defensaDoc.ref, {
     archivoUrl: url,
-    fecha: new Date().toISOString(),
-    calificaciones: {
-      profesor1: null,
-      profesor2: null,
-      profesor3: null,
-      tutor: null
-    }
+    fechaEntrega: new Date().toISOString()
   });
-  //recargar la pagina
-  window.location.reload();
 }
+
 async obtenerEntregaUsuario(tribunalId: string, userEmail: string): Promise<any | null> {
-  const entregasRef = collection(
-    this.db,
-    `/ingenieria_informatica/grado2024-2025/convocatorias/convocatoria_junio/tribunales/${tribunalId}/entregas`
-  );
-  const q = query(entregasRef, where('usuario', '==', userEmail));
-  const snapshot = await getDocs(q);
-  if (!snapshot.empty) {
-    const docSnap = snapshot.docs[0];
-    return { id: docSnap.id, ...docSnap.data() };
-  }
-  return null;
+  const defensasRef = collection(this.db, `${this.pathTribunales}/${tribunalId}/defensas`);
+  const q = query(defensasRef, where('alumno', '==', userEmail));
+  const defensasSnap = await getDocs(q);
+  if (defensasSnap.empty) return null;
+  return defensasSnap.docs[0].data();
 }
-async borrarEntregaUsuario(tribunalId: string, entregaId: string, archivoUrl: string): Promise<void> {
+
+// ...existing code...
+async borrarEntregaUsuario(tribunalId: string, userEmail: string, archivoUrl: string): Promise<void> {
   // Borrar archivo de Storage
   const storage = getStorage();
   const archivoRef = ref(storage, archivoUrl);
   await deleteObject(archivoRef);
 
-  // Borrar documento de Firestore
-  const entregaDocRef = doc(
-    this.db,
-    `/ingenieria_informatica/grado2024-2025/convocatorias/convocatoria_junio/tribunales/${tribunalId}/entregas/${entregaId}`
-  );
-  await deleteDoc(entregaDocRef);
+  // Busca la defensa y borra el campo archivoUrl
+  const defensasRef = collection(this.db, `${this.pathTribunales}/${tribunalId}/defensas`);
+  const q = query(defensasRef, where('alumno', '==', userEmail));
+  const defensasSnap = await getDocs(q);
+  if (defensasSnap.empty) throw new Error('No se encontró la defensa para este alumno');
+  const defensaDoc = defensasSnap.docs[0];
+  await updateDoc(defensaDoc.ref, {
+    archivoUrl: deleteField(),
+    fechaEntrega: deleteField()
+  });
+}
+
+async borrarTribunal(tribunalId: string): Promise<void> {
+  try {
+    const tribunalRef = doc(this.db, this.pathTribunales, tribunalId);
+    await deleteDoc(tribunalRef);
+    console.log('Tribunal borrado con éxito');
+  } catch (error) {
+    console.error('Error al borrar el tribunal:', error);
+    throw error;
+  }
 }
 }
