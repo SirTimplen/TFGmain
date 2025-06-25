@@ -14,7 +14,7 @@ export class GlobalService {
   private pathLineas = '/ingenieria_informatica/grado2024-2025/linea';
   private pathSolicitudes = '/ingenieria_informatica/grado2024-2025/solicitud';
   private pathTribunales = '/ingenieria_informatica/grado2024-2025/convocatorias/convocatoria_junio/tribunales';
-
+  private pathEntregas = '/ingenieria_informatica/grado2024-2025/convocatorias/convocatoria_junio/entregas';
   private userTypeSubject = new BehaviorSubject<'usuario' | 'tutor' | 'admin' | null>(null);
   userType$ = this.userTypeSubject.asObservable();
 
@@ -229,6 +229,18 @@ export class GlobalService {
   const userSnapshot = await getDocs(userRef);
   if (!userSnapshot.empty) {
     return userSnapshot.docs[0].id;
+  }
+  return null;
+ }
+ async getTutorId(): Promise<string | null> {
+  const userEmail = await this.getUserEmail();
+  if (!userEmail) {
+    return null;
+  }
+  const tutorRef = query(collection(this.db, 'Tutor'), where('Correo', '==', userEmail));
+  const tutorSnapshot = await getDocs(tutorRef);
+  if (!tutorSnapshot.empty) {
+    return tutorSnapshot.docs[0].id;
   }
   return null;
  }
@@ -525,7 +537,7 @@ async obtenerTribunales(): Promise<any[]> {
   }
 }
 
-  private async obtenerNombreProfesor(profesorId: string): Promise<string> {
+  async obtenerNombreProfesor(profesorId: string): Promise<string> {
     if (!profesorId) return 'No asignado';
     const profesorDoc = await getDoc(doc(this.db, 'Tutor', profesorId));
     return profesorDoc.exists() ? profesorDoc.data()['Nombre'] : 'No encontrado';
@@ -570,12 +582,6 @@ if (Array.isArray(tribunal.alumnos) && tribunal.alumnos.length > 0) {
         const defensasRef = collection(tribunalDocRef, 'defensas');
         await addDoc(defensasRef, {
           alumno: alumnoId,
-          calificaciones: {
-            presidente: null,
-            secretario: null,
-            vocal: null,
-            tutor: null
-          },
           fecha: fechaTribunal.toISOString(),
           lugar: tribunal.lugar
         });
@@ -624,52 +630,57 @@ if (Array.isArray(tribunal.alumnos) && tribunal.alumnos.length > 0) {
       throw error;
     }
   }
-async subirEntregaTFG(archivo: File, tribunalId: string): Promise<void> {
-  const userEmail = await this.getUserEmail();
-  if (!userEmail) throw new Error('Usuario no autenticado');
+// Subir entrega TFG
+async subirEntregaTFG(archivo: File): Promise<void> {
+  const userId = await this.getUserId();
+  if (!userId) throw new Error('Usuario no autenticado');
   const storage = getStorage();
-  const storageRef = ref(storage, `entregas-tfg/${tribunalId}/${userEmail}_${archivo.name}`);
+  const storageRef = ref(storage, `entregas-tfg/${archivo.name}`);
   const snapshot = await uploadBytes(storageRef, archivo);
   const url = await getDownloadURL(snapshot.ref);
 
-  // Busca la defensa del alumno en la subcolección defensas
-  const defensasRef = collection(this.db, `${this.pathTribunales}/${tribunalId}/defensas`);
-  const q = query(defensasRef, where('alumno', '==', userEmail));
-  const defensasSnap = await getDocs(q);
-  if (defensasSnap.empty) throw new Error('No se encontró la defensa para este alumno');
-
-  const defensaDoc = defensasSnap.docs[0];
-  await updateDoc(defensaDoc.ref, {
-    archivoUrl: url,
-    fechaEntrega: new Date().toISOString()
-  });
+  // Guarda la entrega en la colección entregas
+  const entregasRef = collection(this.db, this.pathEntregas);
+  // Si ya existe, actualiza; si no, crea
+  const q = query(entregasRef, where('usuarioId', '==', userId));
+  const snap = await getDocs(q);
+  if (!snap.empty) {
+    // Actualiza
+    await updateDoc(snap.docs[0].ref, {
+      archivoUrl: url,
+      fechaEntrega: new Date().toISOString()
+    });
+  } else {
+    // Crea
+    await addDoc(entregasRef, {
+      usuarioId: userId,
+      archivoUrl: url,
+      fechaEntrega: new Date().toISOString()
+    });
+  }
 }
 
-async obtenerEntregaUsuario(tribunalId: string, userEmail: string): Promise<any | null> {
-  const defensasRef = collection(this.db, `${this.pathTribunales}/${tribunalId}/defensas`);
-  const q = query(defensasRef, where('alumno', '==', userEmail));
-  const defensasSnap = await getDocs(q);
-  if (defensasSnap.empty) return null;
-  return defensasSnap.docs[0].data();
+// Obtener entrega del usuario
+async obtenerEntregaUsuario(): Promise<any | null> {
+  const userId = await this.getUserId();
+  if (!userId) return null;
+  const entregasRef = collection(this.db, this.pathEntregas);
+  const q = query(entregasRef, where('usuarioId', '==', userId));
+  const snap = await getDocs(q);
+  if (snap.empty) return null;
+  return { id: snap.docs[0].id, ...snap.docs[0].data() };
 }
 
-// ...existing code...
-async borrarEntregaUsuario(tribunalId: string, userEmail: string, archivoUrl: string): Promise<void> {
-  // Borrar archivo de Storage
+// Borrar entrega del usuario
+async borrarEntregaUsuario(entrega: any): Promise<void> {
+  // Borra archivo de Storage
   const storage = getStorage();
-  const archivoRef = ref(storage, archivoUrl);
+  const archivoRef = ref(storage, entrega.archivoUrl);
   await deleteObject(archivoRef);
 
-  // Busca la defensa y borra el campo archivoUrl
-  const defensasRef = collection(this.db, `${this.pathTribunales}/${tribunalId}/defensas`);
-  const q = query(defensasRef, where('alumno', '==', userEmail));
-  const defensasSnap = await getDocs(q);
-  if (defensasSnap.empty) throw new Error('No se encontró la defensa para este alumno');
-  const defensaDoc = defensasSnap.docs[0];
-  await updateDoc(defensaDoc.ref, {
-    archivoUrl: deleteField(),
-    fechaEntrega: deleteField()
-  });
+  // Borra documento de Firestore
+  const entregaRef = doc(this.db, this.pathEntregas, entrega.id);
+  await deleteDoc(entregaRef);
 }
 
 async borrarTribunal(tribunalId: string): Promise<void> {
@@ -682,4 +693,98 @@ async borrarTribunal(tribunalId: string): Promise<void> {
     throw error;
   }
 }
+async obtenerTribunalesPorTutor(tutorId: string ): Promise<any[]> {
+  try {
+    const tribunalesRef = collection(this.db, this.pathTribunales);
+    const tutorQuery = query(tribunalesRef, where('presidente', '==', tutorId) || where('secretario', '==', tutorId) || where('vocal', '==', tutorId) || where('suplente', '==', tutorId));
+    const snapshot = await getDocs(tutorQuery); 
+
+    const tribunales = await Promise.all(snapshot.docs.map(async (doc) => {
+      const data = doc.data();
+      const presidente = await this.obtenerNombreProfesor(data['presidente']);
+      const secretario = await this.obtenerNombreProfesor(data['secretario']);
+      const vocal = await this.obtenerNombreProfesor(data['vocal']);
+      const suplente = await this.obtenerNombreProfesor(data['suplente']);
+
+      return {
+        id: doc.id,
+        presidente: presidente,
+        secretario: secretario,
+        vocal: vocal,
+        suplente: suplente,
+      };
+    }));
+
+    return tribunales;
+  }
+  catch (error) {
+    console.error('Error al obtener los tribunales por tutor:', error);
+    throw error;
+  }
+}
+
+async obtenerDefensasConNombres(tribunalId: string): Promise<any[]> {
+  try {
+    const defensasRef = collection(this.db, `${this.pathTribunales}/${tribunalId}/defensas`);
+    const snapshot = await getDocs(defensasRef);
+
+    // Obtén el puesto del usuario actual
+    const userId = await this.getTutorId();
+    let puesto = '';
+    const tribunalDoc = await getDoc(doc(this.db, this.pathTribunales, tribunalId));
+    if (tribunalDoc.exists()) {
+      const t = tribunalDoc.data();
+      const userName = await this.obtenerNombreProfesor(userId!);
+      if (t['presidente'] && (await this.obtenerNombreProfesor(t['presidente'])) === userName) puesto = 'presidente';
+      else if (t['secretario'] && (await this.obtenerNombreProfesor(t['secretario'])) === userName) puesto = 'secretario';
+      else if (t['vocal'] && (await this.obtenerNombreProfesor(t['vocal'])) === userName) puesto = 'vocal';
+      else if (t['suplente'] && (await this.obtenerNombreProfesor(t['suplente'])) === userName) puesto = 'suplente';
+      else puesto = 'tutor';
+    }
+
+    const defensas = await Promise.all(snapshot.docs.map(async (docDef) => {
+      const data = docDef.data();
+      const alumnoId = data['alumno'];
+      const alumnoNombre = await this.obtenerNombreAlumno(alumnoId);
+
+      // Busca la entrega del alumno para mostrar la nota de este puesto
+      let nota = null;
+      const entregasRef = collection(this.db, this.pathEntregas);
+      const q = query(entregasRef, where('usuarioId', '==', alumnoId));
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        const entregaData = snap.docs[0].data();
+        nota = entregaData[puesto] ?? null;
+      }
+
+      return {
+        id: docDef.id,
+        alumno: alumnoNombre,
+        alumnoId: alumnoId,
+        fecha: data['fecha'],
+        lugar: data['lugar'],
+        calificaciones: data['calificaciones'] || {},
+        nota: nota,
+        puesto: puesto
+      };
+    }));
+
+    return defensas;
+  } catch (error) {
+    console.error('Error al obtener las defensas con nombres:', error);
+    throw error;
+  }
+}
+async guardarCalificacionEnEntrega(usuarioId: string, puesto: string, media: number) {
+  const entregasRef = collection(this.db, this.pathEntregas);
+  const q = query(entregasRef, where('usuarioId', '==', usuarioId));
+  const snap = await getDocs(q);
+  if (!snap.empty) {
+    const entregaRef = snap.docs[0].ref;
+    await updateDoc(entregaRef, {
+      [puesto]: media
+    });
+  }
+}
+
 }

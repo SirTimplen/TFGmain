@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>Trbunal</ion-title>
+    <ion-title>Tribunal</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -13,5 +13,100 @@
       <ion-title size="large">Tribunal</ion-title>
     </ion-toolbar>
   </ion-header>
-  <p>Bienvenido a la página del Tribunal.</p>
+  <ion-list>
+    <ion-item *ngFor="let tribunal of tribunales">
+      <ion-label>
+        <p><strong>Presidente:</strong> {{ tribunal.presidente }}</p>
+        <p><strong>Secretario:</strong> {{ tribunal.secretario }}</p>
+        <p><strong>Vocal:</strong> {{ tribunal.vocal }}</p>
+        <p><strong>Suplente:</strong> {{ tribunal.suplente }}</p>
+      </ion-label>
+      <ion-button (click)="toggleDefensas(tribunal.id)">
+        {{ tribunalSeleccionadoId === tribunal.id ? 'Ocultar Defensas' : 'Ver Defensas' }}
+      </ion-button>
+    </ion-item>
+  </ion-list>
+
+  <ion-card *ngIf="tribunalSeleccionadoId">
+    <ion-card-header>
+      <ion-card-title>Defensas del Tribunal</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item *ngFor="let defensa of defensas">
+  <ion-label>
+    <p><strong>Alumno:</strong> {{ defensa.alumno }}</p>
+    <p><strong>Fecha:</strong> {{ defensa.fecha | date:'dd/MM/yyyy HH:mm' }}</p>
+    <p><strong>Lugar:</strong> {{ defensa.lugar }}</p>
+    <p *ngIf="defensa.archivoUrl">
+      <a [href]="defensa.archivoUrl" download>Descargar TFG</a>
+    </p>
+    <p *ngIf="defensa.nota !== null">
+      <strong>Tu calificación:</strong> {{ defensa.nota | number:'1.2-2' }}
+    </p>
+  </ion-label>
+  <ion-button (click)="toggleCalificar(defensa.id)">
+    {{ defensaSeleccionadaId === defensa.id ? 'Ocultar Calificación' : 'Calificar' }}
+  </ion-button>
+</ion-item>
+        
+      </ion-list>
+      <!-- Formulario de calificación -->
+      <!-- ...existing code... -->
+<!-- Formulario de calificación -->
+<form *ngIf="defensaSeleccionadaId" (ngSubmit)="enviarCalificacion()">
+  <ion-list>
+    <ion-item>
+      <ion-label>Pregunta 1: Redacción del trabajo</ion-label>
+    </ion-item>
+    <ion-item>
+      <input type="number" min="0" max="10" [(ngModel)]="respuestas[0]" name="respuesta0" required style="width: 100%;"/>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Pregunta 2: Originalidad</ion-label>
+    </ion-item>
+    <ion-item>
+      <input type="number" min="0" max="10" [(ngModel)]="respuestas[1]" name="respuesta1" required style="width: 100%;"/>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Pregunta 3: Profundidad técnica</ion-label>
+    </ion-item>
+    <ion-item>
+      <input type="number" min="0" max="10" [(ngModel)]="respuestas[2]" name="respuesta2" required style="width: 100%;"/>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Pregunta 4: Presentación oral</ion-label>
+    </ion-item>
+    <ion-item>
+      <input type="number" min="0" max="10" [(ngModel)]="respuestas[3]" name="respuesta3" required style="width: 100%;"/>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Pregunta 5: Dominio del tema</ion-label>
+    </ion-item>
+    <ion-item>
+      <input type="number" min="0" max="10" [(ngModel)]="respuestas[4]" name="respuesta4" required style="width: 100%;"/>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Pregunta 6: Capacidad de síntesis</ion-label>
+    </ion-item>
+    <ion-item>
+      <input type="number" min="0" max="10" [(ngModel)]="respuestas[5]" name="respuesta5" required style="width: 100%;"/>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Pregunta 7: Respuesta a preguntas</ion-label>
+    </ion-item>
+    <ion-item>
+      <input type="number" min="0" max="10" [(ngModel)]="respuestas[6]" name="respuesta6" required style="width: 100%;"/>
+    </ion-item>
+  </ion-list>
+  <ion-button expand="block" type="submit">Enviar Calificación</ion-button>
+</form>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

@@ -77,8 +77,11 @@ export class TribunalAdminPage implements OnInit {
   }
 
   async cargarAlumnos() {
-    this.alumnos = await this.globalService.obtenerAlumnos(); // Asumimos que existe este método en GlobalService
-  }
+    const entregasRef = collection(this.globalService['db'], '/ingenieria_informatica/grado2024-2025/convocatoria_junio/entregas');
+  const entregasSnap = await getDocs(entregasRef);
+  const idsConEntrega = entregasSnap.docs.map(doc => doc.data()['usuarioId']);
+  this.alumnos = (await this.globalService.obtenerAlumnos()).filter(a => idsConEntrega.includes(a.id));
+}
 
   async crearTribunal() {
     try {
@@ -95,11 +98,6 @@ export class TribunalAdminPage implements OnInit {
     } catch (error) {
       console.error('Error al crear el tribunal:', error);
     }
-  }
-
-  verDetallesTribunal(tribunalId: string) {
-    // Implementar la navegación a una página de detalles del tribunal
-    // donde se puedan ver y gestionar las calificaciones y entregas
   }
 
   onFechaChange(event: any) {

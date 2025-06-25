@@ -82,6 +82,10 @@ export const routes: Routes = [
   {
     path: '**',
     redirectTo: 'login'
+  },
+  {
+    path: 'tutor-calificacion',
+    loadComponent: () => import('./pages/tutor-calificacion/tutor-calificacion.page').then( m => m.TutorCalificacionPage)
   }
   
 ];
