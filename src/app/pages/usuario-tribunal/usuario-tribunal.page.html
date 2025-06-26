@@ -33,6 +33,11 @@
       </ion-item>
       <ion-text color="success" *ngIf="mensaje">{{mensaje}}</ion-text>
     </div>
+    <div *ngIf="notaFinal !== null">
+  <ion-item>
+    <ion-label color="primary"><strong>Nota final del TFG:</strong> {{ notaFinal | number:'1.2-2' }}</ion-label>
+  </ion-item>
+</div>
   </ion-card-content>
 </ion-card>
 <ion-card *ngIf="tribunal">

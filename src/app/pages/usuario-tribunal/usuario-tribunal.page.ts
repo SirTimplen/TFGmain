@@ -33,6 +33,7 @@ export class UsuarioTribunalPage implements OnInit {
   tribunal: any = null;
   entrega: any = null;
   defensa: any = null;
+  notaFinal: number | null = null;
 
   constructor(private globalService: GlobalService) { }
 
@@ -90,6 +91,25 @@ async onFileSelected(event: any) {
 
 async cargarEntrega() {
   this.entrega = await this.globalService.obtenerEntregaUsuario();
+
+  // Calcular la nota final dinámicamente
+  if (this.entrega) {
+    const tutor = this.entrega['tutor'];
+    const tribunalNotas = ['presidente', 'secretario', 'vocal', 'suplente']
+      .map(puesto => this.entrega[puesto])
+      .filter(nota => typeof nota === 'number');
+
+    if (typeof tutor === 'number' && tribunalNotas.length >= 3) {
+      // Tomar las 3 primeras notas del tribunal (o las más altas, si lo prefieres)
+      const tresNotas = tribunalNotas.slice(0, 3);
+      const mediaTribunal = tresNotas.reduce((a, b) => a + b, 0) / 3;
+      this.notaFinal = tutor * 0.3 + mediaTribunal * 0.7;
+    } else {
+      this.notaFinal = null;
+    }
+  } else {
+    this.notaFinal = null;
+  }
 }
 
 async borrarEntrega() {

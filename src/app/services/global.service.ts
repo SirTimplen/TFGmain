@@ -635,7 +635,12 @@ async subirEntregaTFG(archivo: File): Promise<void> {
   const userId = await this.getUserId();
   if (!userId) throw new Error('Usuario no autenticado');
   const storage = getStorage();
-  const storageRef = ref(storage, `entregas-tfg/${archivo.name}`);
+  //guardar el archivo nombre de usuario+ nombre de archivo
+  const userEmail = await this.getUserEmail();
+  if (!userEmail) throw new Error('No se pudo obtener el correo del usuario');
+  const nombreArchivo = `${userEmail}_${archivo.name}`;
+
+  const storageRef = ref(storage, `entregas-tfg/${nombreArchivo}`);
   const snapshot = await uploadBytes(storageRef, archivo);
   const url = await getDownloadURL(snapshot.ref);
 
@@ -693,13 +698,32 @@ async borrarTribunal(tribunalId: string): Promise<void> {
     throw error;
   }
 }
-async obtenerTribunalesPorTutor(tutorId: string ): Promise<any[]> {
+async obtenerTribunalesPorTutor(tutorId: string): Promise<any[]> {
   try {
     const tribunalesRef = collection(this.db, this.pathTribunales);
-    const tutorQuery = query(tribunalesRef, where('presidente', '==', tutorId) || where('secretario', '==', tutorId) || where('vocal', '==', tutorId) || where('suplente', '==', tutorId));
-    const snapshot = await getDocs(tutorQuery); 
 
-    const tribunales = await Promise.all(snapshot.docs.map(async (doc) => {
+    // Haz una consulta por cada puesto
+    const queries = [
+      query(tribunalesRef, where('presidente', '==', tutorId)),
+      query(tribunalesRef, where('secretario', '==', tutorId)),
+      query(tribunalesRef, where('vocal', '==', tutorId)),
+      query(tribunalesRef, where('suplente', '==', tutorId)),
+    ];
+
+    // Ejecuta todas las consultas y combina los resultados
+    const snapshots = await Promise.all(queries.map(q => getDocs(q)));
+    const docsMap = new Map();
+
+    for (const snap of snapshots) {
+      for (const doc of snap.docs) {
+        if (!docsMap.has(doc.id)) {
+          docsMap.set(doc.id, doc);
+        }
+      }
+    }
+
+    // Procesa los tribunales únicos
+    const tribunales = await Promise.all(Array.from(docsMap.values()).map(async (doc) => {
       const data = doc.data();
       const presidente = await this.obtenerNombreProfesor(data['presidente']);
       const secretario = await this.obtenerNombreProfesor(data['secretario']);
@@ -708,16 +732,15 @@ async obtenerTribunalesPorTutor(tutorId: string ): Promise<any[]> {
 
       return {
         id: doc.id,
-        presidente: presidente,
-        secretario: secretario,
-        vocal: vocal,
-        suplente: suplente,
+        presidente,
+        secretario,
+        vocal,
+        suplente,
       };
     }));
 
     return tribunales;
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Error al obtener los tribunales por tutor:', error);
     throw error;
   }
@@ -785,6 +808,44 @@ async guardarCalificacionEnEntrega(usuarioId: string, puesto: string, media: num
       [puesto]: media
     });
   }
+  
+}
+async obtenerSolicitudesAsignadasTutor(tutorEmail: string): Promise<any[]> {
+  const solicitudesRef = collection(this.db, this.pathSolicitudes);
+  const q = query(
+    solicitudesRef,
+    where('tutor', '==', tutorEmail),
+    where('asignacion', '==', true)
+  );
+  const snapshot = await getDocs(q);
+  return Promise.all(snapshot.docs.map(async docSnap => {
+    const data = docSnap.data();
+    // 1. Busca el ID real del alumno a partir del correo
+    const usuarioQuery = query(collection(this.db, 'Usuario'), where('Correo', '==', data['usuario']));
+    const usuarioSnap = await getDocs(usuarioQuery);
+    let alumnoId = null;
+    let alumnoNombre = '';
+    if (!usuarioSnap.empty) {
+      alumnoId = usuarioSnap.docs[0].id;
+      alumnoNombre = usuarioSnap.docs[0].data()['Nombre'] || '';
+    }
+    // 2. Busca la entrega por el ID real del alumno
+    let entrega = null;
+    if (alumnoId) {
+      const entregasRef = collection(this.db, this.pathEntregas);
+      const qEntrega = query(entregasRef, where('usuarioId', '==', alumnoId));
+      const snapEntrega = await getDocs(qEntrega);
+      if (!snapEntrega.empty) {
+        entrega = { id: snapEntrega.docs[0].id, ...snapEntrega.docs[0].data() };
+      }
+    }
+    return {
+      id: docSnap.id,
+      alumnoId,
+      alumnoNombre,
+      entrega
+    };
+  }));
 }
 
 }

@@ -53,11 +53,7 @@ export class AppComponent implements OnInit{
     { title: 'Solicitudes', url: '/pages/solicitudesTutor', icon: 'paper-plane' },
     { title: 'Asignaciones', url: '/pages/asignaciones', icon: 'list' },
     { title: 'Tribunales', url: '/pages/tribunal', icon: 'warning' },
-  ],
-  tribunal: [
-    { title: 'Mis Líneas de TFG', url: '/tutor', icon: 'mail' }, // Asegúrate de que la URL sea correcta
-    { title: 'Solicitudes', url: '/pages/solicitudesTutor', icon: 'paper-plane' },
-    { title: 'Asignaciones', url: '/pages/asignaciones', icon: 'list' },
+    { title: 'Calificación', url: '/tutor-calificacion', icon: 'heart' },
   ],
   admin: [
       { title: 'Administrar Líneas', url: '/admin', icon: 'settings' },

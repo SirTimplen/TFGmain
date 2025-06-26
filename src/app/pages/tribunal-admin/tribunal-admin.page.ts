@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { FormsModule } from '@angular/forms'; // Add FormsModule here
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDoc, getDocs } from 'firebase/firestore';
 import { addDoc, doc, deleteDoc } from 'firebase/firestore';
 
 import { RouterModule } from '@angular/router';
@@ -77,10 +77,22 @@ export class TribunalAdminPage implements OnInit {
   }
 
   async cargarAlumnos() {
-    const entregasRef = collection(this.globalService['db'], '/ingenieria_informatica/grado2024-2025/convocatoria_junio/entregas');
+  // Obtén todos los documentos de entregas
+  const entregasRef = collection(this.globalService['db'], this.globalService['pathEntregas']);
   const entregasSnap = await getDocs(entregasRef);
   const idsConEntrega = entregasSnap.docs.map(doc => doc.data()['usuarioId']);
-  this.alumnos = (await this.globalService.obtenerAlumnos()).filter(a => idsConEntrega.includes(a.id));
+
+  // Obtén todos los alumnos y filtra solo los que han entregado
+  const alumnos = await this.globalService.obtenerAlumnos();
+  this.alumnos = await Promise.all(
+    alumnos
+      .filter(a => idsConEntrega.includes(a.id))
+      .map(async a => ({
+        id: a.id,
+        nombre: a.nombre,
+        correo: a.correo
+      }))
+  );
 }
 
   async crearTribunal() {
@@ -124,24 +136,22 @@ async borrarTribunal(tribunalId: string) {
   }
 }
 async verDefensas(tribunalId: string) {
-  if (this.tribunalSeleccionadoId === tribunalId) {
-    // Si ya está seleccionado, ocultar
-    this.tribunalSeleccionadoId = null;
-    this.defensas = [];
-    this.mostrarFormularioDefensa = false;
-    return;
-  }
   this.tribunalSeleccionadoId = tribunalId;
   this.mostrarFormularioDefensa = false;
   const defensasRef = collection(this.globalService['db'], `${this.globalService['pathTribunales']}/${tribunalId}/defensas`);
   const snapshot = await getDocs(defensasRef);
   this.defensas = await Promise.all(snapshot.docs.map(async docSnap => {
     const data = docSnap.data();
-    const alumno = this.alumnos.find(a => a.id === data['alumno']);
+    // Obtener nombre del alumno
+    let alumnoNombre = '';
+    if (data['alumno']) {
+      const alumnoDoc = await getDoc(doc(this.globalService['db'], 'Usuario', data['alumno']));
+      alumnoNombre = alumnoDoc.exists() ? alumnoDoc.data()['Nombre'] : data['alumno'];
+    }
     return {
       id: docSnap.id,
       ...data,
-      alumnoNombre: alumno ? alumno.nombre : data['alumno']
+      alumno: alumnoNombre
     };
   }));
 }

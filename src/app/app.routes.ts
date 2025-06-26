@@ -80,12 +80,14 @@ export const routes: Routes = [
     canActivate: [LoggedInGuard]
   },
   {
+    path: 'tutor-calificacion',
+    loadComponent: () => import('./pages/tutor-calificacion/tutor-calificacion.page').then( m => m.TutorCalificacionPage),
+    canActivate: [LoggedInGuard]
+  },
+  {
     path: '**',
     redirectTo: 'login'
   },
-  {
-    path: 'tutor-calificacion',
-    loadComponent: () => import('./pages/tutor-calificacion/tutor-calificacion.page').then( m => m.TutorCalificacionPage)
-  }
+  
   
 ];
