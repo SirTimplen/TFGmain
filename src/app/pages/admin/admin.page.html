@@ -42,9 +42,26 @@
   <button class="custom-btn" type="submit" style="width: 100%; margin-top: 12px;">Crear Línea</button>
 </form>
 
-<div class="lineas-container">
-  <div  *ngFor="let linea of lineas">
-    <h2>{{ linea.titulo }}</h2>
+<ion-item>
+  <ion-label>Tutor</ion-label>
+  <ion-select [(ngModel)]="filtroTutor" (ionChange)="onFiltroTutorChange()">
+    <ion-select-option value="">Todos</ion-select-option>
+    <ion-select-option *ngFor="let tutor of tutoresUnicos" [value]="tutor">{{ tutor }}</ion-select-option>
+  </ion-select>
+</ion-item>
+<ion-item>
+  <ion-label>Ámbito</ion-label>
+  <ion-select [(ngModel)]="filtroAmbito" (ionChange)="onFiltroAmbitoChange()">
+    <ion-select-option value="">Todos</ion-select-option>
+    <ion-select-option *ngFor="let ambito of ambitosUnicos" [value]="ambito">{{ ambito }}</ion-select-option>
+  </ion-select>
+</ion-item>
+<div>
+  <ion-card *ngFor="let linea of lineasFiltradas">
+    <ion-card-header>
+      <ion-card-title>{{ linea.titulo }}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
     <p><strong>Ámbito:</strong> {{ linea.ambito }}</p>
     <p><strong>Descripción:</strong> {{ linea.descripcion }}</p>
     <p><strong>Plazas original:</strong> {{ linea.plazasOriginal }}</p>
@@ -53,7 +70,8 @@
       <button class="custom-btn primary" (click)="editarLinea(linea)">Editar</button>
       <button class="custom-btn danger" (click)="borrarLinea(linea)">Borrar</button>
     </div>
-  </div>
+    </ion-card-content>
+  </ion-card>
 </div>
 
 </ion-content>

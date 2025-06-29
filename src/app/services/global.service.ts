@@ -11,10 +11,31 @@ import { arrayUnion,deleteField } from 'firebase/firestore'; // Añade esta impo
   providedIn: 'root',
 })
 export class GlobalService {
-  private pathLineas = '/ingenieria_informatica/grado2024-2025/linea';
-  private pathSolicitudes = '/ingenieria_informatica/grado2024-2025/solicitud';
-  private pathTribunales = '/ingenieria_informatica/grado2024-2025/convocatorias/convocatoria_junio/tribunales';
-  private pathEntregas = '/ingenieria_informatica/grado2024-2025/convocatorias/convocatoria_junio/entregas';
+  private carrera: string = 'ingenieria_informatica';
+  private convocatoria: string = 'convocatoria_junio';
+
+  // Los paths ahora usan las variables dinámicas
+  get pathLineas() {
+    return `/${this.carrera}/grado2024-2025/linea`;
+  }
+  get pathSolicitudes() {
+    return `/${this.carrera}/grado2024-2025/solicitud`;
+  }
+  get pathTribunales() {
+    return `/${this.carrera}/grado2024-2025/convocatorias/${this.convocatoria}/tribunales`;
+  }
+  get pathEntregas() {
+    return `/${this.carrera}/grado2024-2025/convocatorias/${this.convocatoria}/entregas`;
+  }
+
+ setCarrera(carrera: string) {
+  this.carrera = carrera;
+  localStorage.setItem('selectedCarrera', carrera);
+}
+setConvocatoria(convocatoria: string) {
+  this.convocatoria = convocatoria;
+  localStorage.setItem('selectedConvocatoria', convocatoria);
+}
   private userTypeSubject = new BehaviorSubject<'usuario' | 'tutor' | 'admin' | null>(null);
   userType$ = this.userTypeSubject.asObservable();
 
@@ -44,6 +65,10 @@ export class GlobalService {
       .catch((error) => {
         console.error('Error al establecer la persistencia de sesión:', error);
       });
+      const storedCarrera = localStorage.getItem('selectedCarrera');
+  const storedConvocatoria = localStorage.getItem('selectedConvocatoria');
+  if (storedCarrera) this.carrera = storedCarrera;
+  if (storedConvocatoria) this.convocatoria = storedConvocatoria;
   }
 
   async login(email: string, password: string): Promise<'usuario' | 'tutor' | 'admin'> {
@@ -83,7 +108,26 @@ export class GlobalService {
       throw error;
     }
   }
-
+  async getCurrentUserData(): Promise<any> {
+    // Implementa aquí la lógica para obtener el usuario autenticado de Firestore
+    const auth = getAuth();
+    const user = auth.currentUser;
+    const useremail= localStorage.getItem('email');
+    if (user) {
+      const db = getFirestore();
+      const userRef = doc(db, 'Usuario', useremail || user.uid); // Usa el email o uid del usuario autenticado
+      const userDoc = await getDoc(userRef);
+      if (userDoc.exists()) {
+        return userDoc.data();
+      } else {
+        console.error('No se encontró el documento del usuario');
+        return null;
+      }
+    } else {
+      console.error('No hay un usuario autenticado');
+      return null;
+    }
+  }
   setUserType(type: 'usuario' | 'tutor' | 'admin') {
     this.userTypeSubject.next(type);
   }
@@ -183,6 +227,7 @@ export class GlobalService {
       // Asegura que los campos sean number
       const plazasOriginal = Number(linea.plazasOriginal);
       const alumnos: string[] = [];
+      const plazasLibres = plazasOriginal; // Inicialmente todas las plazas están libres
       await addDoc(lineasRef, {
         ...linea,
         tutor: tutorEmail,

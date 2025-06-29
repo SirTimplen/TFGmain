@@ -3,8 +3,18 @@
     <ion-content>
       <ion-list id="inbox-list">
         <ion-list-header>Menú</ion-list-header>
-        <ion-note>Bienvenido, {{userType}}</ion-note>
-
+        <ion-item>
+      <ion-label>Carrera</ion-label>
+      <ion-select [(ngModel)]="selectedCarrera" (ionChange)="onCarreraChange($event)">
+        <ion-select-option *ngFor="let carrera of carrerasDisponibles" [value]="carrera.value">{{ carrera.label }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label>Convocatoria</ion-label>
+      <ion-select [(ngModel)]="selectedConvocatoria" (ionChange)="onConvocatoriaChange($event)">
+        <ion-select-option *ngFor="let convocatoria of convocatoriasDisponibles" [value]="convocatoria.value">{{ convocatoria.label }}</ion-select-option>
+      </ion-select>
+    </ion-item>
         <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages; let i = index">
           <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected">
             <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-sharp'"></ion-icon>

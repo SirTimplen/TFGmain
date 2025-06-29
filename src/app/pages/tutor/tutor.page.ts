@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonButton, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonInput, IonTextarea, IonToolbar, IonButtons, IonMenuButton, IonHeader, IonTitle, IonContent } from '@ionic/angular/standalone';
+import {IonSelect,IonSelectOption, IonLabel,IonItem } from '@ionic/angular/standalone';
+
 import { LineaFormComponent } from '../../components/linea-form/linea-form.component';
 import { ModalController } from '@ionic/angular/standalone';
 import { GlobalService } from '../../services/global.service';
@@ -15,6 +17,10 @@ import { GlobalService } from '../../services/global.service';
     CommonModule,
     FormsModule,
     IonButton,
+    IonSelect,
+    IonSelectOption,
+    IonLabel,
+    IonItem,
     IonCard,
     IonCardHeader,
     IonCardTitle,
@@ -32,7 +38,9 @@ import { GlobalService } from '../../services/global.service';
 })
 export class TutorPage implements OnInit {
   public lineasTFG: any[] = [];
-
+public lineasFiltradas: any[] = [];
+  filtroAmbito: string = '';
+  ambitosUnicos: string[] = [];
   constructor(private modalController: ModalController, private globalService: GlobalService) {}
 
   async ngOnInit() {
@@ -48,7 +56,16 @@ export class TutorPage implements OnInit {
   } catch (error) {
     console.error('Error al cargar las líneas:', error);
   }
+  this.ambitosUnicos = [...new Set(this.lineasTFG.map(l => l.ambito))];
+    this.aplicarFiltros();
 }
+  aplicarFiltros() {
+    this.lineasFiltradas = this.lineasTFG.filter(linea =>
+      (!this.filtroAmbito || linea.ambito === this.filtroAmbito)
+    );
+  }
+  onFiltroAmbitoChange() { this.aplicarFiltros(); }
+
 async crearLinea() {
   const modal = await this.modalController.create({
     component: LineaFormComponent,
@@ -64,6 +81,7 @@ async crearLinea() {
 
         await this.globalService.crearLinea(result.data, tutorEmail);
         this.lineasTFG.push(result.data);
+        location.reload(); // Recarga la página para mostrar la nueva línea
       } else {
         console.error('No se pudo obtener el correo del tutor');
       }

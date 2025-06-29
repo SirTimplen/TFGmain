@@ -8,8 +8,22 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <ion-item>
+    <ion-label>Tutor</ion-label>
+    <ion-select [(ngModel)]="filtroTutor" (ionChange)="onFiltroTutorChange()">
+      <ion-select-option value="">Todos</ion-select-option>
+      <ion-select-option *ngFor="let tutor of tutoresUnicos" [value]="tutor">{{ tutor }}</ion-select-option>
+    </ion-select>
+  </ion-item>
+  <ion-item>
+    <ion-label>Ámbito</ion-label>
+    <ion-select [(ngModel)]="filtroAmbito" (ionChange)="onFiltroAmbitoChange()">
+      <ion-select-option value="">Todos</ion-select-option>
+      <ion-select-option *ngFor="let ambito of ambitosUnicos" [value]="ambito">{{ ambito }}</ion-select-option>
+    </ion-select>
+  </ion-item>
   <div>
-    <ion-card *ngFor="let linea of lineasTFG">
+    <ion-card *ngFor="let linea of lineasFiltradas">
       <ion-card-header>
         <ion-card-title>{{ linea.titulo || 'Sin título' }}</ion-card-title>
       </ion-card-header>

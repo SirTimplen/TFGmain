@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ModalController, AlertController } from '@ionic/angular/standalone';
 import { GlobalService } from '../../services/global.service';
-import { IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonButton, IonInput, IonTextarea } from '@ionic/angular/standalone';
+import { IonHeader,IonSelect,IonCardTitle,IonCard,IonCardHeader,IonCardContent,IonSelectOption, IonLabel,IonItem,IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonButton, IonInput, IonTextarea } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'tfg-admin',
@@ -14,6 +14,15 @@ import { IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent,
     CommonModule,
     FormsModule,
     IonHeader,
+    IonCard,
+    IonCardTitle,
+    IonItem,
+    IonSelect,
+    IonSelectOption,
+    IonCardHeader,
+    IonCardContent,
+    IonLabel,
+    IonSelect,IonSelectOption,
     IonToolbar,
     IonButtons,
     IonMenuButton,
@@ -25,7 +34,12 @@ import { IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent,
     ],
 })
 export class AdminPage implements OnInit {
-  public lineas: any[] = [];
+   public lineas: any[] = [];
+  public lineasFiltradas: any[] = [];
+  filtroTutor: string = '';
+  filtroAmbito: string = '';
+  tutoresUnicos: string[] = [];
+  ambitosUnicos: string[] = [];
   public nuevaLinea: any = {
     titulo: '',
     ambito: '',
@@ -43,8 +57,20 @@ export class AdminPage implements OnInit {
   ) {}
 
   async ngOnInit() {
-    await this.cargarLineas();
+    this.lineas = await this.globalService.obtenerLineas();
+    this.tutoresUnicos = [...new Set(this.lineas.map(l => l.tutor))];
+    this.ambitosUnicos = [...new Set(this.lineas.map(l => l.ambito))];
+    this.aplicarFiltros();
   }
+
+  aplicarFiltros() {
+    this.lineasFiltradas = this.lineas.filter(linea =>
+      (!this.filtroTutor || linea.tutor === this.filtroTutor) &&
+      (!this.filtroAmbito || linea.ambito === this.filtroAmbito)
+    );
+  }
+  onFiltroTutorChange() { this.aplicarFiltros(); }
+  onFiltroAmbitoChange() { this.aplicarFiltros(); }
 
   async cargarLineas() {
     this.lineas = await this.globalService.obtenerLineas();

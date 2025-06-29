@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common'; // Importa CommonModule
-import { IonApp, IonToolbar, IonButtons,IonNote, IonMenuButton, IonHeader, IonMenu, IonContent, IonTitle, IonList, IonListHeader, IonMenuToggle, IonItem, IonIcon, IonLabel, IonRouterOutlet, IonRouterLink } from '@ionic/angular/standalone';
+import { IonApp,IonSelect,IonSelectOption, IonToolbar, IonButtons,IonNote, IonMenuButton, IonHeader, IonMenu, IonContent, IonTitle, IonList, IonListHeader, IonMenuToggle, IonItem, IonIcon, IonLabel, IonRouterOutlet, IonRouterLink } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, heartOutline, heartSharp, warningOutline, warningSharp } from 'ionicons/icons';
 import { GlobalService } from './services/global.service';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 interface MenuPage {
   title: string;
   url: string;
@@ -18,10 +19,13 @@ interface MenuPage {
   imports: [
     CommonModule, // Agrega CommonModule para habilitar *ngFor
     RouterLink,
+    FormsModule,
+    IonSelect,
+    IonSelectOption,
     RouterLinkActive,
     IonApp,
+    IonApp,
     IonNote,
-    IonHeader,
     IonButtons,
     IonToolbar,
     IonMenuButton,
@@ -62,6 +66,16 @@ export class AppComponent implements OnInit{
       // Puedes añadir más opciones si lo deseas
     ],
 };
+carrerasDisponibles=[
+    { value: 'ingenieria_informatica', label: 'Ingenieria Informatica' },
+    { value: 'enfermeria', label: 'Enfermeria' }
+  ];
+  convocatoriasDisponibles = [
+    { value: 'convocatoria_junio', label: 'Convocatoria Junio' },
+    { value: 'convocatoria_julio', label: 'Convocatoria Julio' }
+  ];
+  selectedCarrera: string = '';
+  selectedConvocatoria: string = 'convocatoria_junio';
 
 constructor(public globalService: GlobalService, private router: Router) {this.globalService.userType$.subscribe(userType => {
     if (userType) {
@@ -71,13 +85,23 @@ constructor(public globalService: GlobalService, private router: Router) {this.g
     }
   });}
   
-  ngOnInit() {
+  async ngOnInit() {
   const userType = localStorage.getItem('userType') as 'usuario' | 'tutor' | 'admin' | null;
   if (userType) {
     this.userType = userType;
     this.globalService.setUserType(userType);
   }
-}
+     const storedCarrera = localStorage.getItem('selectedCarrera');
+  const storedConvocatoria = localStorage.getItem('selectedConvocatoria');
+  if (storedCarrera) {
+    this.selectedCarrera = storedCarrera;
+    this.globalService.setCarrera(storedCarrera);
+  }
+  if (storedConvocatoria) {
+    this.selectedConvocatoria = storedConvocatoria;
+    this.globalService.setConvocatoria(storedConvocatoria);
+  }
+  }
 
   logout() {
     this.globalService.logout();
@@ -88,5 +112,20 @@ constructor(public globalService: GlobalService, private router: Router) {this.g
   // Método para obtener las páginas del menú según el tipo de usuario
   get appPages(): MenuPage[] {
   return this.userType && this.menus[this.userType] ? this.menus[this.userType] : [];
+}
+
+
+onCarreraChange(event: any) {
+  localStorage.setItem('selectedCarrera', this.selectedCarrera);
+  this.globalService.setCarrera(this.selectedCarrera);
+  //recargar pagina
+  window.location.reload();
+}
+
+onConvocatoriaChange(event: any) {
+  localStorage.setItem('selectedConvocatoria', this.selectedConvocatoria);
+  this.globalService.setConvocatoria(this.selectedConvocatoria);
+  window.location.reload();
+
 }
 }
