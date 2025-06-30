@@ -136,7 +136,14 @@ async borrarTribunal(tribunalId: string) {
   }
 }
 async verDefensas(tribunalId: string) {
+  if (this.tribunalSeleccionadoId === tribunalId) {
+    // Si ya está seleccionado, oculta las defensas
+    this.tribunalSeleccionadoId = null;
+    this.defensas = [];
+    return;
+  }
   this.tribunalSeleccionadoId = tribunalId;
+  this.mostrarFormulario = false; // Oculta el formulario de creación si está abierto
   this.mostrarFormularioDefensa = false;
   const defensasRef = collection(this.globalService['db'], `${this.globalService['pathTribunales']}/${tribunalId}/defensas`);
   const snapshot = await getDocs(defensasRef);

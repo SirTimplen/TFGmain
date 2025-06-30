@@ -103,15 +103,15 @@
     </ion-button>
     <form *ngIf="mostrarFormularioDefensa" (ngSubmit)="anadirDefensa()">
       <ion-item>
-        <ion-label>Fecha y hora</ion-label>
+        <ion-label position="floating">Fecha y hora</ion-label>
         <ion-datetime [(ngModel)]="nuevaFecha" name="nuevaFecha" required></ion-datetime>
       </ion-item>
       <ion-item>
-        <ion-label>Lugar</ion-label>
+        <ion-label position="floating">Lugar</ion-label>
         <ion-input [(ngModel)]="nuevoLugar" name="nuevoLugar" required></ion-input>
       </ion-item>
       <ion-item>
-  <ion-label>Alumno</ion-label>
+  <ion-label position="floating">Alumno</ion-label>
   <ion-select interface="alert" [(ngModel)]="nuevoAlumnoId" name="nuevoAlumnoId" required>
     <ion-select-option *ngFor="let alumno of alumnos" [value]="alumno.id">{{alumno.correo}}</ion-select-option>
   </ion-select>
