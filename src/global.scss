@@ -36,160 +36,83 @@
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
 /* Puedes poner esto en src/global.scss o importarlo en cada página */
-/* global.scss o variables.scss */
-
-:root {
-  /* Colores principales */
-  --ion-color-primary: #0d47a1;
-  --ion-color-primary-rgb: 13, 71, 161;
-  --ion-color-secondary: #1565c0;
-  --ion-color-secondary-rgb: 21, 101, 192;
-  --ion-color-tertiary: #42a5f5;
-  --ion-color-tertiary-rgb: 66, 165, 245;
-  --ion-color-success: #2e7d32;
-  --ion-color-warning: #f9a825;
-  --ion-color-danger: #c62828;
-  --ion-color-medium: #666;
-  --ion-color-light: #f5f5f5;
-  --ion-color-dark: #263238;
-
-  /* Fuentes */
-  --ion-font-family: 'Roboto', 'Helvetica Neue', sans-serif;
-
-  /* Radius y sombras */
-  --border-radius: 12px;
-  --box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Reset general */
-body {
-  font-family: var(--ion-font-family);
-  background: var(--ion-color-light);
-  color: var(--ion-color-dark);
-  margin: 0;
-}
-
-/* Botones */
-ion-button {
-  --border-radius: var(--border-radius);
-  --box-shadow: var(--box-shadow);
-  text-transform: none;
-  font-weight: 500;
-}
-
-/* Inputs */
-ion-input, ion-select, ion-textarea {
-  --border-radius: var(--border-radius);
-  --padding-start: 12px;
-  --padding-end: 12px;
-  --highlight-color-focused: var(--ion-color-primary);
-  border: 1px solid #ccc;
-  background-color: #fff;
-  transition: border-color 0.2s ease;
-}
-
-ion-input:focus-within, ion-select:focus-within, ion-textarea:focus-within {
-  border-color: var(--ion-color-primary);
-}
-
-/* Cards */
-ion-card {
-  --border-radius: var(--border-radius);
-  --box-shadow: var(--box-shadow);
-  padding: 12px;
-  background: #ffffff;
-}
-
-/* Headers */
-ion-header {
-  box-shadow: var(--box-shadow);
-  --background: var(--ion-color-primary);
-  --color: #ff2a2a;
-}
-
-ion-toolbar {
-  --color: #1a1414;
-  font-weight: 500;
-}
-
-/* Lists */
-ion-item {
-  --border-radius: var(--border-radius);
-  --inner-padding-end: 8px;
-  --inner-padding-start: 8px;
-  --background: #fff;
-  margin-bottom: 8px;
-  border: 1px solid #e0e0e0;
-}
-
-ion-label {
+.custom-btn {
+  display: inline-block;
+  padding: 8px 16px;
+  margin: 2px 0;
   font-size: 15px;
-  color: var(--ion-color-dark);
   font-weight: 500;
+  border: none;
+  border-radius: 5px;
+  background: #3880ff;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
-ion-icon {
-  font-size: 20px;
-  color: var(--ion-color-medium);
+.custom-btn.primary {
+  background: #3880ff;
 }
 
-/* Titles */
-ion-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--ion-color-dark);
+.custom-btn.success {
+  background: #10dc60;
 }
 
-/* Tabs */
-ion-tab-bar {
-  --background: #fff;
-  --border: 1px solid #ddd;
-  --color-selected: var(--ion-color-primary);
+.custom-btn.danger {
+  background: #eb445a;
 }
 
-/* Modals y Alerts */
-ion-modal {
-  --border-radius: var(--border-radius);
-  --background: #fff;
-  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+.custom-btn.warning {
+  background: #ffc409;
+  color: #333;
 }
 
-.alert-wrapper {
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
+.custom-btn:disabled,
+.custom-btn[disabled] {
+  background: #ccc;
+  color: #888;
+  cursor: not-allowed;
 }
 
-/* Toasts */
-ion-toast {
-  --background: var(--ion-color-dark);
-  --color: #fff;
-  font-size: 14px;
+.custom-btn:hover:not(:disabled) {
+  filter: brightness(0.95);
+}
+// Puedes poner esto en global.scss o usuario.page.scss
+
+.lineas-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  padding: 24px 8px;
 }
 
-/* Custom Scrollbars (opcional) */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-thumb {
-  background-color: var(--ion-color-medium);
-  border-radius: 4px;
-}
-
-/* Animación suave para interacción */
-ion-button,
-ion-input,
-ion-select,
-ion-card,
-ion-item {
-  transition: all 0.3s ease-in-out;
+.linea-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  padding: 20px 24px;
+  max-width: 350px;
+  min-width: 260px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+  transition: box-shadow 0.2s;
 }
 
-/* Responsive container (útil si no usas IonGrid) */
-.app-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1rem;
+.linea-card:hover {
+  box-shadow: 0 4px 20px rgba(56,128,255,0.15);
 }
-.ion-menu-button {
-  color: var(--ion-color-dark);
+
+.linea-card h2 {
+  margin: 0 0 8px 0;
+  font-size: 1.3em;
+  color: #3880ff;
+}
+
+.linea-card p {
+  margin: 0 0 4px 0;
+  font-size: 1em;
 }

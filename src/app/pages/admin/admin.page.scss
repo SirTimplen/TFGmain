@@ -1,2 +1,54 @@
 
 
+
+.linea-card h3 {
+  margin-bottom: 18px;
+  color: #3880ff;
+  font-size: 1.3em;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: #495057;
+  font-size: 15px;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 10px 14px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-size: 15px;
+  background: #f9f9f9;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #3880ff;
+  background: #fff;
+  box-shadow: 0 0 4px rgba(56,128,255,0.10);
+}
+
+.form-group textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+.custom-btn[type="submit"] {
+  width: 100%;
+  margin-top: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 10px 0;
+  border-radius: 6px;
+}
