@@ -8,8 +8,12 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <ion-item>
+    <ion-label position="floating">Buscar alumno</ion-label>
+    <ion-input [(ngModel)]="searchTerm" (ionInput)="aplicarFiltro()" placeholder="Nombre del alumno"></ion-input>
+  </ion-item>
   <div>
-    <ion-card *ngFor="let solicitud of solicitudes">
+    <ion-card *ngFor="let solicitud of solicitudesFiltradas">
       <ion-card-header>
         <ion-card-title>{{ solicitud.linea }}</ion-card-title>
       </ion-card-header>
@@ -27,7 +31,7 @@
         </div>
       </ion-card-content>
     </ion-card>
-    <ion-card *ngIf="solicitudes.length === 0">
+    <ion-card *ngIf="solicitudesFiltradas.length === 0">
       <ion-card-content style="text-align:center;">
         No hay solicitudes disponibles.
       </ion-card-content>

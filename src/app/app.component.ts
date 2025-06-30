@@ -74,7 +74,7 @@ carrerasDisponibles=[
     { value: 'convocatoria_junio', label: 'Convocatoria Junio' },
     { value: 'convocatoria_julio', label: 'Convocatoria Julio' }
   ];
-  selectedCarrera: string = '';
+  selectedCarrera: string = 'ingenieria_informatica';
   selectedConvocatoria: string = 'convocatoria_junio';
 
 constructor(public globalService: GlobalService, private router: Router) {this.globalService.userType$.subscribe(userType => {

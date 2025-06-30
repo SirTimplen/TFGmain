@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton } from '@ionic/angular/standalone';
 import { GlobalService } from '../../services/global.service';
-
+import {IonSelect,IonSelectOption, IonLabel,IonItem,IonInput } from '@ionic/angular/standalone';
+import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-admin-asignaciones',
   templateUrl: './admin-asignaciones.page.html',
@@ -22,22 +22,42 @@ import { GlobalService } from '../../services/global.service';
       IonCardTitle,
       IonCardContent,
       IonButton,
+      IonSelect,
+      IonSelectOption,
+      IonLabel,
+      IonItem,
+      IonInput,
+      FormsModule,
     ]
     ,})
 export class AdminAsignacionesPage implements OnInit {
 
   public solicitudesAceptadas: any[] = [];
+  public solicitudesFiltradas: any[] = [];
+  public searchTerm: string = '';
+  public filtroTutor: string = '';
+  public tutoresUnicos: string[] = [];
 
   constructor(private globalService: GlobalService) { }
 
   async ngOnInit() {
     try {
       this.solicitudesAceptadas = await this.globalService.obtenerSolicitudesAceptadas();
+      this.tutoresUnicos = [...new Set(this.solicitudesAceptadas.map(s => s.tutor).filter(Boolean))];
+
+      this.aplicarFiltro();
+
     } catch (error) {
       console.error('Error al cargar las solicitudes aceptadas:', error);
     }
   }
-
+  aplicarFiltro() {
+    const term = this.searchTerm.trim().toLowerCase();
+    this.solicitudesFiltradas = this.solicitudesAceptadas.filter(s =>
+      (!term || (s.usuario && s.usuario.toLowerCase().includes(term))) &&
+      (!this.filtroTutor || s.tutor === this.filtroTutor)
+    );
+  }
   async asignarSolicitud(solicitud: any) {
     try {
       // Logic to assign the request definitively

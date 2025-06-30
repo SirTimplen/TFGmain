@@ -28,7 +28,7 @@
         </ion-item>
         <ion-item>
           <ion-label position="floating">Presidente/a</ion-label>
-          <ion-select [(ngModel)]="nuevoTribunal.profesor1" name="presidente">
+          <ion-select interface="alert" [(ngModel)]="nuevoTribunal.profesor1" name="presidente">
             <ion-select-option *ngFor="let profesor of profesores" [value]="profesor.id">{{profesor.correo}}</ion-select-option>
           </ion-select>
         </ion-item>
@@ -112,7 +112,7 @@
       </ion-item>
       <ion-item>
   <ion-label>Alumno</ion-label>
-  <ion-select [(ngModel)]="nuevoAlumnoId" name="nuevoAlumnoId" required>
+  <ion-select interface="alert" [(ngModel)]="nuevoAlumnoId" name="nuevoAlumnoId" required>
     <ion-select-option *ngFor="let alumno of alumnos" [value]="alumno.id">{{alumno.correo}}</ion-select-option>
   </ion-select>
 </ion-item>

@@ -8,44 +8,37 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">adminAsignaciones</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <div class="solicitudes-container">
-    <ion-card *ngFor="let solicitud of solicitudesAceptadas">
+  <ion-item>
+    <ion-label position="floating">Buscar alumno</ion-label>
+    <ion-input [(ngModel)]="searchTerm" (ionInput)="aplicarFiltro()" placeholder="Nombre del alumno"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-label>Tutor</ion-label>
+    <ion-select interface="alert" [(ngModel)]="filtroTutor" (ionChange)="aplicarFiltro()">
+      <ion-select-option value="">Todos</ion-select-option>
+      <ion-select-option *ngFor="let tutor of tutoresUnicos" [value]="tutor">{{ tutor }}</ion-select-option>
+    </ion-select>
+  </ion-item>
+  
+  <div>
+    <ion-card *ngFor="let solicitud of solicitudesFiltradas">
       <ion-card-header>
         <ion-card-title>{{ solicitud.linea }}</ion-card-title>
       </ion-card-header>
       <ion-card-content>
         <p><strong>Alumno:</strong> {{ solicitud.usuario }}</p>
         <p><strong>Tutor:</strong> {{ solicitud.tutor }}</p>
-        <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 8px;">
-          <ion-button color="success" expand="block" (click)="asignarSolicitud(solicitud)" [disabled]="solicitud.asignacion">
-            Asignar Definitivamente
-          </ion-button>
-          <ion-button color="warning" expand="block" (click)="desasignarSolicitud(solicitud)">
-            Desasignar
-          </ion-button>
-          <ion-button color="danger" expand="block" (click)="cancelarSolicitud(solicitud)">
-            Cancelar
-          </ion-button>
-        </div>
+        <p><strong>Estado:</strong> {{ solicitud.estado }}</p>
+        <!-- Botones de asignar/desasignar/cancelar según tu lógica -->
+        <ion-button color="success" (click)="asignarSolicitud(solicitud)" [disabled]="solicitud.asignacion">Asignar</ion-button>
+        <ion-button color="warning" (click)="desasignarSolicitud(solicitud)" [disabled]="!solicitud.asignacion">Desasignar</ion-button>
+        <ion-button color="danger" (click)="cancelarSolicitud(solicitud)">Cancelar</ion-button>
       </ion-card-content>
     </ion-card>
-    <ion-card *ngIf="solicitudesAceptadas.length === 0">
+    <ion-card *ngIf="solicitudesFiltradas.length === 0">
       <ion-card-content style="text-align:center;">
-        No hay solicitudes aceptadas.
+        No hay asignaciones disponibles.
       </ion-card-content>
     </ion-card>
   </div>
-
-  <ion-button color="primary" expand="block" (click)="asignarTodas()">
-    Asignar Todas
-  </ion-button>
-  <ion-button color="danger" expand="block" (click)="desasignarTodas()">
-    Desasignar Todas
-  </ion-button>
 </ion-content>

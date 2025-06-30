@@ -18,7 +18,7 @@
     <ion-select-option *ngFor="let ambito of ambitosUnicos" [value]="ambito">{{ ambito }}</ion-select-option>
   </ion-select>
 </ion-item>
-<div class="lineas-container">
+<div>
   <ion-card *ngFor="let linea of lineasFiltradas">
       <ion-card-header>
         <ion-card-title>{{ linea.titulo || 'Sin título' }}</ion-card-title>

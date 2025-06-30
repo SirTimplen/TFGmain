@@ -430,7 +430,7 @@ setConvocatoria(convocatoria: string) {
       const usuarioQuery = query(
         solicitudesRef,
         where('usuario', '==', userEmail),
-        where('estado', 'in', ['Pendiente', 'Aceptada por tutor'])
+        where('estado', 'in', ['Pendiente', 'Aceptada por tutor','Aceptada'])
       );
       const snapshot = await getDocs(usuarioQuery);
 
@@ -683,9 +683,7 @@ async subirEntregaTFG(archivo: File): Promise<void> {
   //guardar el archivo nombre de usuario+ nombre de archivo
   const userEmail = await this.getUserEmail();
   if (!userEmail) throw new Error('No se pudo obtener el correo del usuario');
-  const nombreArchivo = `${userEmail}_${archivo.name}`;
-
-  const storageRef = ref(storage, `entregas-tfg/${nombreArchivo}`);
+  const storageRef = ref(storage, `entregas-tfg/${userEmail}/${archivo.name}`);
   const snapshot = await uploadBytes(storageRef, archivo);
   const url = await getDownloadURL(snapshot.ref);
 
