@@ -182,7 +182,7 @@ setConvocatoria(convocatoria: string) {
           const data = docSnapshot.data();
 
           // Obtén el nombre de la línea
-          const lineaDoc = await getDoc(doc(this.db, this.pathLineas, this.pathLineas));
+          const lineaDoc = await getDoc(doc(this.db, this.pathLineas, data['linea']));
           const lineaNombre = lineaDoc.exists() ? lineaDoc.data()?.['titulo'] || 'Sin título' : 'Sin título';
 
           // Obtén el nombre del tutor
@@ -328,6 +328,8 @@ setConvocatoria(convocatoria: string) {
       const snapshot = await getDocs(tutorQuery);
 
       const solicitudes = await Promise.all(
+        //Filtra las solicitudes que no han sido rechazadas por el admin
+
         snapshot.docs.map(async (docSnapshot) => {
           const data = docSnapshot.data();
 
@@ -350,7 +352,7 @@ setConvocatoria(convocatoria: string) {
         })
       );
 
-      return solicitudes;
+      return solicitudes.filter(solicitud => solicitud.estado !== 'Rechazada por admin'); // Filtra las solicitudes rechazadas por el admin
     } catch (error) {
       console.error('Error al obtener las solicitudes por tutor:', error);
       throw error;
@@ -513,7 +515,14 @@ async crearSolicitud(tutorId: string, lineaId: string): Promise<void> {
       throw error;
     }
   }
-
+  async borrarSolicitud(solicitudId: string): Promise<void> {
+  try {
+    const solicitudRef = doc(this.db, this.pathSolicitudes, solicitudId);
+    await deleteDoc(solicitudRef);
+  } catch (error) {
+    throw error;
+  }
+}
   async obtenerSolicitudesAceptadas(): Promise<any[]> {
     try {
       const solicitudesRef = collection(this.db, this.pathSolicitudes);
