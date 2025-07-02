@@ -106,6 +106,12 @@ constructor(public globalService: GlobalService, private router: Router) {this.g
   logout() {
     this.globalService.logout();
     this.userType = null;
+    localStorage.removeItem('userType');
+    localStorage.removeItem('selectedCarrera');
+    localStorage.removeItem('selectedConvocatoria');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('email');
+
     this.router.navigate(['/login']);
   }
 

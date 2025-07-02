@@ -100,7 +100,6 @@ async cargarEntrega() {
       .filter(nota => typeof nota === 'number');
 
     if (typeof tutor === 'number' && tribunalNotas.length >= 3) {
-      // Tomar las 3 primeras notas del tribunal (o las más altas, si lo prefieres)
       const tresNotas = tribunalNotas.slice(0, 3);
       const mediaTribunal = tresNotas.reduce((a, b) => a + b, 0) / 3;
       this.notaFinal = tutor * 0.3 + mediaTribunal * 0.7;

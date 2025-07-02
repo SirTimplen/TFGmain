@@ -377,15 +377,17 @@ setConvocatoria(convocatoria: string) {
 
       const lineaData = lineaSnapshot.data();
       const alumnos = lineaData['alumnos'] || [];
+      const plazasOriginal = lineaData['plazasOriginal'] || 0;
+      const plazasLibres = plazasOriginal - alumnos.length;
 
       if (estado === 'Aceptada' && solicitudData['estado'] !== 'Aceptada') {
-        if (lineaData['plazasLibres'] > 0) {
+        if (plazasLibres > 0) {
           // Añade el correo del alumno al array de alumnos
           alumnos.push(solicitudData['usuario']);
         } else {
           throw new Error('No hay plazas disponibles');
         }
-      } else if (estado === 'Rechazada por tutor' && solicitudData['estado'] === 'Aceptada') {
+      } else if (estado === 'Rechazada por tutor' && solicitudData['estado'] === 'Aceptada' || estado === 'Rechazada por admin') {
         // Remueve el correo del alumno del array de alumnos si existe
         const index = alumnos.indexOf(solicitudData['usuario']);
         if (index > -1) {
@@ -394,13 +396,13 @@ setConvocatoria(convocatoria: string) {
       }
 
       // Recalcula las plazas libres
-      const plazasLibres = lineaData['plazasOriginal'] - alumnos.length;
+      const plazasLibresAct = lineaData['plazasOriginal'] - alumnos.length;
 
       // Actualiza el estado de la solicitud
       await updateDoc(solicitudRef, { estado });
 
       // Actualiza las plazas libres y el array de alumnos de la línea
-      await updateDoc(lineaRef, { plazasLibres, alumnos });
+      await updateDoc(lineaRef, { plazasLibresAct, alumnos });
 
       console.log(`Estado de la solicitud actualizado a: ${estado}`);
     } catch (error) {
